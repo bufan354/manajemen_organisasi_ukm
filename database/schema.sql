@@ -247,13 +247,15 @@ CREATE TABLE IF NOT EXISTS admin_sessions (
 -- Tabel: fingerprint_pending (sinkronisasi mode enroll ESP32)
 -- -----------------------------------------------------------
 CREATE TABLE IF NOT EXISTS fingerprint_pending (
-    id          INT AUTO_INCREMENT PRIMARY KEY,
-    anggota_id  INT NOT NULL,
-    ukm_id      INT NOT NULL,
-    status      ENUM('pending','processing','done','failed','cancelled') DEFAULT 'pending',
-    token       VARCHAR(64) NOT NULL UNIQUE,
-    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    expires_at  TIMESTAMP NOT NULL,
+    id              INT AUTO_INCREMENT PRIMARY KEY,
+    anggota_id      INT NOT NULL,
+    ukm_id          INT NOT NULL,
+    action          ENUM('enroll','delete') NOT NULL DEFAULT 'enroll',
+    fingerprint_id  INT NULL,                         -- ID slot sensor (diisi saat delete)
+    status          ENUM('pending','processing','done','failed','cancelled') DEFAULT 'pending',
+    token           VARCHAR(64) NOT NULL UNIQUE,
+    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    expires_at      TIMESTAMP NOT NULL,
     FOREIGN KEY (anggota_id) REFERENCES anggota(id) ON DELETE CASCADE,
     INDEX idx_status_expires (status, expires_at),
     INDEX idx_ukm_status (ukm_id, status)

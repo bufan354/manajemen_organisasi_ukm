@@ -1,5 +1,6 @@
 #include <WiFi.h>
 #include <HTTPClient.h>
+#include <WiFiClientSecure.h>
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 #include <Adafruit_Fingerprint.h>
@@ -11,6 +12,22 @@
 String activeServerUrl = ""; // Akan otomatis diisi server mana yang jalan
 int lastServerIndex = -1;    // Indeks server terakhir yang sukses
 Preferences prefs;
+
+// ==========================================
+// HELPER: Buat HTTP client sesuai protokol
+// ==========================================
+WiFiClient wifiClientPlain;
+WiFiClientSecure wifiClientSecure;
+
+// Mengembalikan referensi client yang tepat dan setup http connection
+void beginHttpRequest(HTTPClient& http, const String& url) {
+  if (url.startsWith("https")) {
+    wifiClientSecure.setInsecure(); // Skip verifikasi sertifikat (aman untuk IoT internal)
+    http.begin(wifiClientSecure, url);
+  } else {
+    http.begin(wifiClientPlain, url);
+  }
+}
 
 
 // ==========================================
@@ -233,11 +250,10 @@ void setup() {
     Serial.print("[SPEED] Mencoba server terakhir: ");
     Serial.println(SERVER_URLS[lastServerIndex]);
     
-    WiFiClient client;
     HTTPClient http;
-    http.begin(client, String(SERVER_URLS[lastServerIndex]) + "?action=mode");
+    beginHttpRequest(http, String(SERVER_URLS[lastServerIndex]) + "?action=mode");
     http.addHeader("X-API-KEY", api_key);
-    http.setTimeout(2500); // Timeout lebih pendek untuk fast-check
+    http.setTimeout(3000); // Sedikit lebih lama untuk HTTPS handshake
     int httpCode = http.GET();
     
     if (httpCode == 200) {
@@ -262,14 +278,13 @@ void setup() {
         // Lewati yang sudah dicoba di tahap fast boot jika gagal
         if (retry == 0 && i == lastServerIndex) continue;
 
-        WiFiClient client;
         HTTPClient http;
         String testUrl = String(SERVER_URLS[i]) + "?action=mode";
         Serial.print("Mencoba: "); Serial.println(testUrl);
         
-        http.begin(client, testUrl);
+        beginHttpRequest(http, testUrl);
         http.addHeader("X-API-KEY", api_key);
-        http.setTimeout(2000); // 2 Detik saja untuk pencarian awal
+        http.setTimeout(4000); // Lebih lama untuk HTTPS handshake
         int httpCode = http.GET();
         
         if (httpCode == 200) {
@@ -369,10 +384,9 @@ void checkServerMode() {
   if (activeServerUrl.length() == 0) {
     Serial.println("[WARN] Server URL kosong, mencoba cari ulang...");
     for (int i = 0; i < NUM_SERVERS; i++) {
-      WiFiClient client;
       HTTPClient http;
       String testUrl = String(SERVER_URLS[i]) + "?action=mode";
-      http.begin(client, testUrl);
+      beginHttpRequest(http, testUrl);
       http.addHeader("X-API-KEY", api_key);
       http.setTimeout(5000);
       int httpCode = http.GET();
@@ -393,13 +407,12 @@ void checkServerMode() {
     if (activeServerUrl.length() == 0) return;
   }
   
-  WiFiClient client;
   HTTPClient http;
   // Menghilangkan &ukm_id=1
   String url = activeServerUrl + "?action=mode";
   
   Serial.println("--- POLL #" + String(pollCount) + " ---");
-  http.begin(client, url);
+  beginHttpRequest(http, url);
   http.addHeader("X-API-KEY", api_key);
   http.setTimeout(5000);
   
@@ -473,11 +486,10 @@ void checkServerMode() {
 // HTTP: Post Verification Result
 // ==========================================
 void postVerificationResult(int fingerprintId) {
-  WiFiClient client;
   HTTPClient http;
   String url = activeServerUrl + "?action=verify";
   
-  http.begin(client, url);
+  beginHttpRequest(http, url);
   http.addHeader("Content-Type", "application/json");
   http.addHeader("X-API-KEY", api_key);
   http.setTimeout(5000);
@@ -540,11 +552,10 @@ void postVerificationResult(int fingerprintId) {
 // HTTP: Post Enrollment/Deletion Result
 // ==========================================
 void postEnrollmentResult(String token, int fingerprintId) {
-  WiFiClient client;
   HTTPClient http;
   String url = activeServerUrl + "?action=register";
   
-  http.begin(client, url);
+  beginHttpRequest(http, url);
   http.addHeader("Content-Type", "application/json");
   http.addHeader("X-API-KEY", api_key);
   http.setTimeout(5000);
@@ -559,11 +570,10 @@ void postEnrollmentResult(String token, int fingerprintId) {
 }
 
 void postDeletionResult(String token, int slot) {
-  WiFiClient client;
   HTTPClient http;
   String url = activeServerUrl + "?action=delete";
   
-  http.begin(client, url);
+  beginHttpRequest(http, url);
   http.addHeader("Content-Type", "application/json");
   http.addHeader("X-API-KEY", api_key);
   http.setTimeout(5000);
