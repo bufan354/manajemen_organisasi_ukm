@@ -53,7 +53,8 @@
                 <?php if ($stage === 'none'): ?>
                     <!-- STAGE 1: PASSWORD -->
                     <form action="index.php?action=backup_verify_password" method="POST" class="space-y-6">
-                        <?= csrf_field() ?>
+    <?= csrf_field() ?>
+                        
                         <div class="text-center mb-6">
                             <h2 class="text-xl font-bold text-on-surface mb-1">Konfirmasi Identitas</h2>
                             <p class="text-xs text-on-surface-variant">Masukkan kata sandi akun superadmin Anda.</p>
@@ -76,7 +77,8 @@
                 <?php elseif ($stage === 'password_verified' && !empty($admin['is_2fa_active'])): ?>
                     <!-- STAGE 2: 2FA OTP -->
                     <form action="index.php?action=backup_verify_2fa" method="POST" class="space-y-6 text-center">
-                        <?= csrf_field() ?>
+    <?= csrf_field() ?>
+                        
                         <div class="mb-6">
                             <h2 class="text-xl font-bold text-on-surface mb-1">Masukan Kode OTP</h2>
                             <p class="text-xs text-on-surface-variant">Buka aplikasi Authenticator Anda dan masukkan 6 digit kode.</p>
@@ -114,7 +116,8 @@
                         </div>
 
                         <form action="index.php?action=backup_download" method="POST">
-                            <?= csrf_field() ?>
+    <?= csrf_field() ?>
+                            
                             <button type="submit" class="w-full bg-emerald-600 text-white py-5 rounded-3xl font-black shadow-[0_15px_30px_rgba(16,185,129,0.3)] hover:bg-emerald-500 hover:-translate-y-1 transition-all active:scale-95 flex items-center justify-center gap-4 text-xl group border-2 border-emerald-400/20">
                                 <span class="material-symbols-outlined text-2xl group-hover:bounce transition-transform">download</span>
                                 Unduh Database Sekarang

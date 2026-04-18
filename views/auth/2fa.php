@@ -16,6 +16,7 @@
                 </div>
                 
                 <form action="index.php?page=dashboard" method="POST" class="space-y-8">
+    <?= csrf_field() ?>
                     <div class="flex justify-between gap-2 md:gap-4 px-2">
                         <input class="otp-input w-full aspect-square text-center text-2xl font-bold bg-surface-container-highest rounded-lg border-none transition-all duration-200" maxlength="1" placeholder="0" type="text" name="otp_1"/>
                         <input class="otp-input w-full aspect-square text-center text-2xl font-bold bg-surface-container-highest rounded-lg border-none transition-all duration-200" maxlength="1" placeholder="0" type="text" name="otp_2"/>

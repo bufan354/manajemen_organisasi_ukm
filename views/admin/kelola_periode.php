@@ -82,7 +82,8 @@
                         <td class="p-5 flex gap-2">
                             <?php if (!$pr['is_active']): ?>
                             <form action="index.php?action=periode_set_active" method="POST" class="inline" onsubmit="return confirm('Jadikan periode ini sebagai yang aktif untuk publik?');">
-                                <?= csrf_field() ?>
+    <?= csrf_field() ?>
+                                
                                 <input type="hidden" name="id" value="<?= $pr['id'] ?>">
                                 <input type="hidden" name="ukm_id" value="<?= $ukm['id'] ?>">
                                 <button type="submit" class="px-3 py-2 bg-success/10 text-success hover:bg-success hover:text-on-primary rounded-xl font-bold text-[10px] uppercase tracking-wider border border-success/20 transition-all flex items-center gap-1.5">
@@ -96,7 +97,8 @@
                             </button>
                             
                             <form action="index.php?action=periode_delete" method="POST" class="inline" onsubmit="return confirm('Yakin ingin menghapus periode ini? Periode yang sudah ada isinya akan kehilangan datanya (Cascading Delete). Lanjutkan?');">
-                                <?= csrf_field() ?>
+    <?= csrf_field() ?>
+                                
                                 <input type="hidden" name="id" value="<?= $pr['id'] ?>">
                                 <input type="hidden" name="ukm_id" value="<?= $ukm['id'] ?>">
                                 <button type="submit" class="px-3 py-2 bg-error/10 text-error hover:bg-error hover:text-white rounded-xl font-bold text-[10px] uppercase tracking-wider border border-error/20 transition-all flex items-center gap-1.5">
@@ -122,7 +124,8 @@
             </button>
         </div>
         <form action="index.php?action=periode_store" method="POST">
-            <?= csrf_field() ?>
+    <?= csrf_field() ?>
+            
             <input type="hidden" name="ukm_id" value="<?= $ukm['id'] ?>">
             
             <div class="mb-5">
@@ -160,7 +163,8 @@
             </button>
         </div>
         <form action="index.php?action=periode_update" method="POST">
-            <?= csrf_field() ?>
+    <?= csrf_field() ?>
+            
             <input type="hidden" name="id" id="edit_id">
             <input type="hidden" name="ukm_id" value="<?= $ukm['id'] ?>">
             

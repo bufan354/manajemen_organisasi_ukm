@@ -105,7 +105,8 @@
                 <?php else: ?>
                 
                 <form id="registration-form" action="index.php?action=pendaftaran_register" method="POST">
-                    <?= csrf_field() ?>
+    <?= csrf_field() ?>
+                    
                     <!-- STEP 1: Identitas Pribadi -->
                     <div id="step-1" class="p-8 lg:p-12 transition-all duration-500">
                         <h3 class="text-2xl font-black text-slate-900 mb-1">Informasi Dasar</h3>

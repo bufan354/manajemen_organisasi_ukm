@@ -15,7 +15,8 @@
             <?php $flash = renderFlash(); if ($flash) echo $flash; ?>
             
             <form action="index.php?action=verify_2fa_post" method="POST" class="space-y-8">
-                <?= csrf_field() ?>
+    <?= csrf_field() ?>
+                
                 <!-- OTP Field -->
                 <div class="space-y-2">
                     <div class="relative group">

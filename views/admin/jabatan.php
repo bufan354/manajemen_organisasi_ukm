@@ -152,7 +152,8 @@ $levelOptions = [
             </button>
         </div>
         <form action="index.php?action=jabatan_store" method="POST" class="space-y-4">
-            <?= csrf_field() ?>
+    <?= csrf_field() ?>
+            
             <input type="hidden" name="ukm_id" value="<?= $selectedUkmId ?: (int)Session::get('ukm_id') ?>">
 
             <div>
@@ -198,7 +199,8 @@ $levelOptions = [
             </button>
         </div>
         <form action="index.php?action=jabatan_update" method="POST" class="space-y-4">
-            <?= csrf_field() ?>
+    <?= csrf_field() ?>
+            
             <input type="hidden" name="id" id="edit-id">
 
             <div>
@@ -245,7 +247,8 @@ $levelOptions = [
         <p class="text-sm text-on-surface-variant mb-1">Jabatan <strong id="delete-jabatan-nama" class="text-on-surface"></strong> akan dihapus permanen.</p>
         <p class="text-xs text-on-surface-variant mb-6">Jabatan tidak dapat dihapus jika masih digunakan oleh anggota.</p>
         <form action="index.php?action=jabatan_delete" method="POST" class="flex gap-3">
-            <?= csrf_field() ?>
+    <?= csrf_field() ?>
+            
             <input type="hidden" name="id" id="delete-id">
             <button type="button" onclick="closeModal('modal-delete')" class="flex-1 px-4 py-3 bg-surface-container-high text-on-surface font-bold rounded-xl hover:bg-surface-container-highest transition-colors text-sm">
                 Batal

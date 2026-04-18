@@ -6,7 +6,8 @@
             <!-- Section: Profil Saya -->
             <section class="bg-white p-8 rounded-3xl shadow-sm border border-surface-container">
                 <form action="index.php?action=update_profile" method="POST" enctype="multipart/form-data" class="flex flex-col md:flex-row gap-8 items-start">
-                    <?= csrf_field() ?>
+    <?= csrf_field() ?>
+                    
                     <!-- Circular Upload -->
                     <div class="relative group">
                         <div class="w-32 h-32 rounded-3xl ring-4 ring-primary-fixed overflow-hidden bg-surface-container">
@@ -142,7 +143,8 @@
                                 method="POST" 
                                 class="md:ml-auto shrink-0"
                                 onsubmit="return confirmRevoke(this, event)">
-                                <?= csrf_field() ?>
+    <?= csrf_field() ?>
+                                
                                 <input type="hidden" name="session_id" value="<?= htmlspecialchars($session['session_id']) ?>">
                                 <button type="submit" 
                                     class="flex items-center gap-2 bg-white text-red-600 hover:bg-red-600 hover:text-white border border-red-200 hover:border-red-600 font-bold text-xs uppercase tracking-wider px-5 py-2.5 rounded-xl shadow-sm hover:shadow-md active:scale-95 transition-all duration-200 group">
@@ -176,7 +178,8 @@
             <!-- Change Password -->
             <section class="bg-white p-6 rounded-3xl shadow-sm border border-surface-container">
                 <form action="index.php?action=update_password" method="POST">
-                    <?= csrf_field() ?>
+    <?= csrf_field() ?>
+                    
                     <h3 class="text-md font-bold mb-6 flex items-center gap-2">
                         <span class="material-symbols-outlined text-primary" data-icon="key">key</span>
                         Ubah Password
@@ -218,7 +221,8 @@
                     <p class="text-xs text-on-primary/70 mb-6">Lapisan keamanan tambahan via OTP 6 digit sedang berjalan. Untuk mematikannya, harap konfirmasi ulang kata sandi Anda.</p>
                     
                     <form action="index.php?action=reset_2fa_dashboard" method="POST" onsubmit="return confirm('Yakin ingin mematikan 2FA? Keamanan akun Anda dapat menurun.');" class="space-y-3">
-                        <?= csrf_field() ?>
+    <?= csrf_field() ?>
+                        
                         <div>
                             <input class="w-full bg-on-primary/10 border-none rounded-lg px-4 py-2 text-center text-sm focus:ring-0 border-b-2 border-transparent focus:border-b-white transition-all font-mono placeholder:text-on-primary/40 text-white" name="password" placeholder="Masukkan Password Anda" type="password" required autocomplete="off"/>
                         </div>
@@ -243,7 +247,8 @@
                 <!-- Form Verifikasi Password Sebelum Setup -->
                 <p class="text-xs text-on-surface-variant mb-4">Fitur keamanan ganda (2FA) perlindungan dari peretasan jarak jauh. Masukkan password Anda untuk melihat kode aktivasi.</p>
                 <form action="index.php?action=init_setup_2fa_dashboard" method="POST" class="space-y-4">
-                    <?= csrf_field() ?>
+    <?= csrf_field() ?>
+                    
                     <div>
                         <label class="block text-[10px] font-bold uppercase tracking-wider text-on-surface-variant mb-1">Verifikasi Password Anda</label>
                         <input class="w-full bg-surface-container-highest border-none rounded-lg px-4 py-2 text-center text-sm focus:ring-0 border-b-2 border-transparent focus:border-b-primary transition-all font-mono placeholder:text-outline" name="password" placeholder="••••••••" type="password" required autocomplete="off"/>
@@ -279,7 +284,8 @@
                 </div>
                 
                 <form action="index.php?action=setup_2fa_dashboard" method="POST" class="space-y-4">
-                    <?= csrf_field() ?>
+    <?= csrf_field() ?>
+                    
                     <div>
                         <label class="block text-[10px] font-bold uppercase tracking-wider text-on-surface-variant mb-1">Masukkan Kode OTP 6-Digit</label>
                         <input class="w-full bg-surface-container-highest border-none rounded-lg px-4 py-2 text-center text-lg tracking-[0.5em] focus:ring-0 border-b-2 border-transparent focus:border-b-primary transition-all font-mono" name="otp" placeholder="000000" type="text" maxlength="6" pattern="\d{6}" required autocomplete="off"/>
@@ -411,6 +417,7 @@
 <!-- Hidden form: Revoke All -->
 <form id="form-revoke-all" action="index.php?action=revoke_all_sessions" method="POST" class="hidden">
     <?= csrf_field() ?>
+    
 </form>
 
 <script src="assets/admin/js/pengaturan.js"></script>

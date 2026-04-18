@@ -91,7 +91,8 @@
                             <div class="flex items-center justify-end gap-2">
                                 <?php if ($st === 'pending'): ?>
                                 <form action="index.php?action=pendaftaran_status" method="POST" class="m-0 inline-block">
-                                    <?= csrf_field() ?>
+    <?= csrf_field() ?>
+                                    
                                     <input type="hidden" name="id" value="<?= $p['id'] ?>">
                                     <input type="hidden" name="status" value="diterima">
                                     <button type="submit" onclick="return confirm('Terima pendaftar ini? Data akan dipindahkan ke buku tabel Anggota Utama.')" class="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all flex items-center justify-center font-bold text-xs" title="Setujui/Terima">
@@ -99,7 +100,8 @@
                                     </button>
                                 </form>
                                 <form action="index.php?action=pendaftaran_status" method="POST" class="m-0 inline-block" onsubmit="return handleReject(this)">
-                                    <?= csrf_field() ?>
+    <?= csrf_field() ?>
+                                    
                                     <input type="hidden" name="id" value="<?= $p['id'] ?>">
                                     <input type="hidden" name="status" value="ditolak">
                                     <input type="hidden" name="alasan_tolak" class="reject-reason" value="">
@@ -109,7 +111,8 @@
                                 </form>
                                 <?php else: ?>
                                 <form action="index.php?action=pendaftaran_delete" method="POST" class="m-0 inline-block">
-                                    <?= csrf_field() ?>
+    <?= csrf_field() ?>
+                                    
                                     <input type="hidden" name="id" value="<?= $p['id'] ?>">
                                     <button type="submit" onclick="return confirm('Hapus permanen arsip pendaftaran ini?')" class="p-2 text-outline hover:text-error hover:bg-error-container rounded-lg transition-all flex items-center justify-center font-bold text-xs" title="Hapus Arsip">
                                         <span class="material-symbols-outlined text-[20px]">delete</span>

@@ -164,7 +164,8 @@ foreach ($kehadiranList as $k) {
             Upload file CSV yang berisi NIM anggota untuk mencatat kehadiran secara manual. Baris pertama dianggap sebagai header. Kehadiran akan tersimpan dengan metode 'Manual'.
         </p>
         <form action="index.php?action=kehadiran_import_csv" method="POST" enctype="multipart/form-data" class="flex flex-col gap-4">
-            <?= csrf_field() ?>
+    <?= csrf_field() ?>
+            
             <input type="hidden" name="event_id" value="<?= $ev['id'] ?>">
             <div class="mb-4">
                 <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">File CSV (Kolom 1: NIM)</label>

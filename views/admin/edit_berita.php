@@ -12,7 +12,8 @@
     
     <?= renderFlash() ?>
     <form action="index.php?action=berita_update" method="POST" enctype="multipart/form-data" class="space-y-8 pb-32">
-        <?= csrf_field() ?>
+    <?= csrf_field() ?>
+        
         <input type="hidden" name="id" value="<?= $b['id'] ?? '' ?>">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <!-- Left Column: Content & Metadata -->

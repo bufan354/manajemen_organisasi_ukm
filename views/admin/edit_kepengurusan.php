@@ -14,7 +14,8 @@
 
     <div class="max-w-4xl bg-surface-container-lowest rounded-2xl shadow-[0_12px_40px_rgba(25,28,30,0.04)] p-8">
         <form action="index.php?action=kepengurusan_update" method="POST" enctype="multipart/form-data" class="space-y-6">
-            <?= csrf_field() ?>
+    <?= csrf_field() ?>
+            
             <input type="hidden" name="id" value="<?= $kp['id'] ?? '' ?>">
             <div class="grid grid-cols-2 gap-6">
                 <div class="space-y-2">

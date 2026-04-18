@@ -32,7 +32,8 @@ $heroOverlay    = (int)($s['hero_overlay_opacity'] ?? 20);
     <?= renderFlash() ?>
 
     <form action="index.php?action=konfigurasi_umum_save" method="POST" enctype="multipart/form-data" class="space-y-8">
-        <?= csrf_field() ?>
+    <?= csrf_field() ?>
+        
 
 
         <!-- ============================================ -->

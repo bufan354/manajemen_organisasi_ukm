@@ -84,7 +84,8 @@
 
                 <div class="flex gap-2 border-l border-outline-variant/30 pl-2">
                     <form action="index.php?action=ukm_toggle_status" method="POST" class="inline m-0">
-                        <?= csrf_field() ?>
+    <?= csrf_field() ?>
+                        
                         <input type="hidden" name="id" value="<?= $ukm['id'] ?>">
                         <?php if (($ukm['status'] ?? 'aktif') === 'aktif'): ?>
                         <button type="submit" class="w-8 h-8 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center hover:bg-orange-600 hover:text-white transition-colors" title="Nonaktifkan" onclick="return confirm('Nonaktifkan <?= h($ENTITY) ?> ini? <?= h($ENTITY) ?> tidak akan tampil di halaman publik.')">
@@ -98,7 +99,8 @@
                     </form>
 
                     <form action="index.php?action=ukm_delete" method="POST" class="inline m-0">
-                        <?= csrf_field() ?>
+    <?= csrf_field() ?>
+                        
                         <input type="hidden" name="id" value="<?= $ukm['id'] ?>">
                         <button type="submit" class="w-8 h-8 rounded-xl bg-error/10 text-error flex items-center justify-center hover:bg-error hover:text-white transition-colors" title="Hapus (Soft Delete)" onclick="return confirm('Anda yakin ingin menghapus <?= h($ENTITY) ?> ini? Data masih tersimpan secara soft-delete di database.')">
                             <span class="material-symbols-outlined text-[16px]">delete</span>

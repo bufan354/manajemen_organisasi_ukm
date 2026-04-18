@@ -16,7 +16,8 @@
     <!-- Form Section -->
     <div class="max-w-4xl bg-surface-container-lowest rounded-2xl shadow-[0_12px_40px_rgba(25,28,30,0.04)] p-8">
         <form action="index.php?action=event_update" method="POST">
-            <?= csrf_field() ?>
+    <?= csrf_field() ?>
+            
             <input type="hidden" name="id" value="<?= $ev['id'] ?? '' ?>">
             <div class="space-y-6">
                 <?php if (!empty($ukmList)): ?>

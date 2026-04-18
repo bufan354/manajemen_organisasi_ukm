@@ -52,7 +52,8 @@ $questions = json_decode($questionsJson, true) ?: [];
     <?php else: ?>
 
     <form action="index.php?action=pendaftaran_config_save" method="POST">
-        <?= csrf_field() ?>
+    <?= csrf_field() ?>
+        
         <input type="hidden" name="ukm_id" value="<?= $ukmId ?>">
         
         <div class="flex justify-end mb-6">

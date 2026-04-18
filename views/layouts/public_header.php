@@ -18,7 +18,6 @@
 </head>
 <body class="bg-surface text-on-surface font-body selection:bg-primary-fixed-dim selection:text-on-primary">
 
-<!-- Top Navigation Bar -->
 <header class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-sm dark:shadow-none w-full top-0 sticky z-50">
     <nav class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between tracking-tight">
         <!-- Logo -->
@@ -27,7 +26,7 @@
         <!-- Desktop Navigation -->
         
         <div class="hidden md:flex items-center gap-8">
-            <!-- Active State Handled via PHP if we were to make it dynamic, but for now we'll do simple highlights based on page -->
+            <!-- Active State Handled via PHP -->
             <?php $reqPage = $_GET['page'] ?? 'home'; ?>
             
             <a class="<?= $reqPage === 'home' ? 'text-blue-700 dark:text-blue-400 font-semibold border-b-2 border-blue-700' : 'text-slate-600 dark:text-slate-400 hover:text-blue-600' ?> transition-all py-1" href="index.php?page=home">Beranda</a>
@@ -40,9 +39,48 @@
                 <span class="material-symbols-outlined absolute left-3 text-slate-400 text-sm">search</span>
                 <input type="text" placeholder="Cari <?= h(getEntityLabel()) ?>..." class="pl-9 pr-4 py-2 bg-slate-100 rounded-full text-sm outline-none w-48 focus:w-64 transition-all focus:ring-2 ring-primary/20">
             </div>
-            <a href="index.php?page=login" class="bg-primary text-white px-6 py-2 rounded-xl font-medium transform hover:scale-[1.02] active:scale-95 duration-200 inline-block text-center whitespace-nowrap shadow-sm">Sign In</a>
+            
+            <!-- Desktop Sign In Button -->
+            <a href="index.php?page=login" class="hidden md:inline-block bg-primary text-white px-6 py-2 rounded-xl font-medium transform hover:scale-[1.02] active:scale-95 duration-200 text-center whitespace-nowrap shadow-sm">Sign In</a>
+
+            <!-- Mobile Menu Toggle -->
+            <button id="mobileMenuBtn" class="md:hidden flex items-center justify-center p-2 text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+                <span class="material-symbols-outlined text-2xl">menu</span>
+            </button>
         </div>
     </nav>
+
+    <!-- Mobile Navigation Dropdown -->
+    <div id="mobileMenu" class="hidden md:hidden absolute top-20 left-0 w-full bg-white dark:bg-slate-900 shadow-xl border-t border-slate-100 dark:border-slate-800 flex-col px-6 py-4 space-y-4">
+        <?php $reqPage = $_GET['page'] ?? 'home'; ?>
+        <a class="<?= $reqPage === 'home' ? 'text-blue-700 dark:text-blue-400 font-semibold' : 'text-slate-600 dark:text-slate-400' ?> block py-2" href="index.php?page=home">Beranda</a>
+        <a class="<?= $reqPage === 'katalog_ukm' ? 'text-blue-700 dark:text-blue-400 font-semibold' : 'text-slate-600 dark:text-slate-400' ?> block py-2" href="index.php?page=katalog_ukm"><?= h(getEntityLabel()) ?></a>
+        <a class="<?= $reqPage === 'tentang' ? 'text-blue-700 dark:text-blue-400 font-semibold' : 'text-slate-600 dark:text-slate-400' ?> block py-2" href="index.php?page=tentang">Tentang Kami</a>
+        <hr class="border-slate-100 dark:border-slate-800">
+        <a href="index.php?page=login" class="bg-primary text-white block w-full py-3 rounded-xl font-medium text-center shadow-sm">Sign In</a>
+    </div>
 </header>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const btn = document.getElementById('mobileMenuBtn');
+        const menu = document.getElementById('mobileMenu');
+        const icon = btn.querySelector('.material-symbols-outlined');
+
+        btn.addEventListener('click', () => {
+            const isHidden = menu.classList.contains('hidden');
+            if (isHidden) {
+                menu.classList.remove('hidden');
+                menu.classList.add('flex');
+                icon.textContent = 'close';
+            } else {
+                menu.classList.add('hidden');
+                menu.classList.remove('flex');
+                icon.textContent = 'menu';
+            }
+        });
+    });
+</script>
+
 <main>
 

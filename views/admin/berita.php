@@ -155,6 +155,7 @@
             Apakah Anda yakin ingin menghapus publikasi <strong id="deleteTargetName" class="text-slate-800"></strong> secara permanen?
         </p>
         <form action="index.php?action=berita_delete" method="POST" class="flex gap-4">
+    <?= csrf_field() ?>
             <input type="hidden" name="id" id="deleteTargetId">
             <button type="button" onclick="closeDeleteModal()" class="flex-1 py-3 px-4 bg-slate-100 text-slate-600 font-bold text-sm rounded-xl hover:bg-slate-200 transition-colors">Batal</button>
             <button type="submit" class="flex-1 py-3 px-4 bg-red-600 text-white font-bold text-sm rounded-xl shadow-lg shadow-red-200 hover:bg-red-700 transition-colors">Ya, Hapus</button>

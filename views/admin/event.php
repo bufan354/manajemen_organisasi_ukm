@@ -260,7 +260,8 @@
             Apakah Anda yakin ingin menghapus kegiatan <strong id="deleteTargetName" class="text-slate-800"></strong>? Log absensi juga bisa terpengaruh.
         </p>
         <form action="index.php?action=event_delete" method="POST" class="flex gap-4">
-            <?= csrf_field() ?>
+    <?= csrf_field() ?>
+            
             <input type="hidden" name="id" id="deleteTargetId">
             <button type="button" onclick="closeDeleteModal()" class="flex-1 py-3 px-4 bg-slate-100 text-slate-600 font-bold text-sm rounded-xl hover:bg-slate-200 transition-colors">Batal</button>
             <button type="submit" class="flex-1 py-3 px-4 bg-red-600 text-white font-bold text-sm rounded-xl shadow-lg shadow-red-200 hover:bg-red-700 transition-colors">Ya, Hapus</button>
@@ -280,7 +281,8 @@
             Upload file CSV yang berisi daftar kegiatan. Format kolom: Nama Kegiatan, Waktu Mulai (Y-m-d H:i:s), Waktu Selesai (opsional), Lokasi (opsional), Deskripsi (opsional). Baris pertama dianggap sebagai header.
         </p>
         <form action="index.php?action=event_import_csv" method="POST" enctype="multipart/form-data" class="flex flex-col gap-4">
-            <?= csrf_field() ?>
+    <?= csrf_field() ?>
+            
             <?php if (Session::get('admin_role') === 'superadmin'): ?>
             <div class="mb-2">
                 <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Pilih UKM Target</label>
@@ -314,7 +316,8 @@
         <h3 class="text-2xl font-black text-slate-900 text-center mb-2">Undur Kegiatan</h3>
         <p class="text-slate-500 text-center text-sm leading-relaxed mb-6" id="postponeText"></p>
         <form action="index.php?action=event_postpone" method="POST" class="flex flex-col gap-4">
-            <?= csrf_field() ?>
+    <?= csrf_field() ?>
+            
             <input type="hidden" name="id" id="postponeId">
             <div class="grid grid-cols-2 gap-4">
                 <div class="space-y-1">
@@ -348,7 +351,8 @@
         <h3 class="text-2xl font-black text-slate-900 text-center mb-2">Batalkan Kegiatan</h3>
         <p class="text-slate-500 text-center text-sm leading-relaxed mb-6" id="cancelText"></p>
         <form action="index.php?action=event_cancel" method="POST" class="flex flex-col gap-4">
-            <?= csrf_field() ?>
+    <?= csrf_field() ?>
+            
             <input type="hidden" name="id" id="cancelId">
             <div class="space-y-1">
                 <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Alasan Pembatalan</label>

@@ -16,7 +16,8 @@
             
             <?php $flash = renderFlash(); if ($flash) echo $flash; ?>
             <form action="index.php?action=login" method="POST" class="space-y-6">
-                <?= csrf_field() ?>
+    <?= csrf_field() ?>
+                
                 <!-- Email Field -->
                 <div class="space-y-2">
                     <label class="block text-xs font-medium uppercase tracking-widest text-on-surface-variant px-1" for="email">Email Address</label>
