@@ -1,6 +1,7 @@
 -- ============================================================
 -- Skema Database: Sistem Absensi IoT
 -- Engine: InnoDB | Charset: utf8mb4
+-- Versi: 2.0 (Full Schema - Termasuk semua migrasi)
 -- ============================================================
 
 CREATE DATABASE IF NOT EXISTS absensi_iot
@@ -8,6 +9,8 @@ CREATE DATABASE IF NOT EXISTS absensi_iot
     COLLATE utf8mb4_unicode_ci;
 
 USE absensi_iot;
+
+SET FOREIGN_KEY_CHECKS = 0;
 
 -- -----------------------------------------------------------
 -- Tabel: ukm
@@ -30,19 +33,39 @@ CREATE TABLE IF NOT EXISTS ukm (
 ) ENGINE=InnoDB;
 
 -- -----------------------------------------------------------
+-- Tabel: periode (periode kepengurusan ukm)
+-- Dipindahkan ke atas agar FK dari admins & anggota tidak gagal
+-- -----------------------------------------------------------
+CREATE TABLE IF NOT EXISTS periode (
+    id            INT AUTO_INCREMENT PRIMARY KEY,
+    ukm_id        INT          NOT NULL,
+    tahun_mulai   YEAR         NOT NULL,
+    tahun_selesai YEAR         NOT NULL,
+    is_active     TINYINT(1)   DEFAULT 0,
+    nama          VARCHAR(150) NOT NULL,
+    deskripsi     TEXT         DEFAULT NULL,
+    dokumen_path  VARCHAR(255) DEFAULT NULL,
+    created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (ukm_id) REFERENCES ukm(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- -----------------------------------------------------------
 -- Tabel: admins (Admin UKM & Superadmin)
 -- -----------------------------------------------------------
 CREATE TABLE IF NOT EXISTS admins (
-    id          INT AUTO_INCREMENT PRIMARY KEY,
-    ukm_id      INT          DEFAULT NULL,
-    nama        VARCHAR(150) NOT NULL,
-    email       VARCHAR(150) NOT NULL UNIQUE,
-    password    VARCHAR(255) NOT NULL,
-    role        ENUM('superadmin','admin') NOT NULL DEFAULT 'admin',
-    periode_id  INT DEFAULT NULL,
-    foto_path   VARCHAR(255) DEFAULT NULL,
-    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    id              INT AUTO_INCREMENT PRIMARY KEY,
+    ukm_id          INT          DEFAULT NULL,
+    nama            VARCHAR(150) NOT NULL,
+    email           VARCHAR(150) NOT NULL UNIQUE,
+    password        VARCHAR(255) NOT NULL,
+    role            ENUM('superadmin','admin') NOT NULL DEFAULT 'admin',
+    periode_id      INT DEFAULT NULL,
+    foto_path       VARCHAR(255) DEFAULT NULL,
+    is_2fa_active   TINYINT(1)  DEFAULT 0,
+    totp_secret     VARCHAR(64)  DEFAULT NULL,
+    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (ukm_id) REFERENCES ukm(id) ON DELETE SET NULL,
     FOREIGN KEY (periode_id) REFERENCES periode(id) ON DELETE SET NULL
 ) ENGINE=InnoDB;
@@ -112,7 +135,10 @@ CREATE TABLE IF NOT EXISTS berita (
 CREATE TABLE IF NOT EXISTS events (
     id              INT AUTO_INCREMENT PRIMARY KEY,
     ukm_id          INT          NOT NULL,
-    periode_id      INT          DEFAULT NULL,   -- Opsional: event bisa terikat ke periode
+    is_routine      TINYINT(1)   NOT NULL DEFAULT 0,   -- 1 = Event Rutin (Master), 0 = Event Biasa
+    hari_rutin      VARCHAR(20)  DEFAULT NULL,          -- Hari berulang: '1,3,5' (Senin,Rabu,Jum)
+    parent_id       INT          DEFAULT NULL,          -- ID master jika ini anak event rutin
+    periode_id      INT          DEFAULT NULL,          -- Opsional: event bisa terikat ke periode
     nama            VARCHAR(200) NOT NULL,
     deskripsi       TEXT         DEFAULT NULL,
     waktu_mulai     DATETIME     NOT NULL,
@@ -125,25 +151,11 @@ CREATE TABLE IF NOT EXISTS events (
     updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (ukm_id) REFERENCES ukm(id) ON DELETE CASCADE,
     FOREIGN KEY (periode_id) REFERENCES periode(id) ON DELETE SET NULL,
-    INDEX idx_active_event (ukm_id, status_absensi, waktu_mulai, waktu_selesai)
+    INDEX idx_active_event (ukm_id, status_absensi, waktu_mulai, waktu_selesai),
+    INDEX idx_routine (ukm_id, is_routine)
 ) ENGINE=InnoDB;
 
--- -----------------------------------------------------------
--- Tabel: periode (periode kepengurusan ukm)
--- -----------------------------------------------------------
-CREATE TABLE IF NOT EXISTS periode (
-    id            INT AUTO_INCREMENT PRIMARY KEY,
-    ukm_id        INT          NOT NULL,
-    tahun_mulai   YEAR         NOT NULL,
-    tahun_selesai YEAR         NOT NULL,
-    is_active     TINYINT(1)   DEFAULT 0,
-    nama          VARCHAR(150) NOT NULL,
-    deskripsi     TEXT         DEFAULT NULL,
-    dokumen_path  VARCHAR(255) DEFAULT NULL,
-    created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (ukm_id) REFERENCES ukm(id) ON DELETE CASCADE
-) ENGINE=InnoDB;
+-- (Tabel periode sudah dibuat di atas, sebelum admins)
 
 -- -----------------------------------------------------------
 -- Tabel: pendaftaran (registrasi calon anggota via web)
@@ -259,3 +271,43 @@ CREATE TABLE IF NOT EXISTS notifikasi (
     FOREIGN KEY (user_id) REFERENCES admins(id) ON DELETE CASCADE,
     INDEX (user_id, is_dibaca, created_at)
 ) ENGINE=InnoDB;
+
+-- -----------------------------------------------------------
+-- Tabel: pengaturan_umum (pengaturan global sistem)
+-- -----------------------------------------------------------
+CREATE TABLE IF NOT EXISTS pengaturan_umum (
+    id         INT AUTO_INCREMENT PRIMARY KEY,
+    key_name   VARCHAR(100) UNIQUE NOT NULL,
+    value      TEXT,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- -----------------------------------------------------------
+-- Tabel: login_attempts (Rate limiting login)
+-- -----------------------------------------------------------
+CREATE TABLE IF NOT EXISTS login_attempts (
+    id           INT AUTO_INCREMENT PRIMARY KEY,
+    ip_address   VARCHAR(45) NOT NULL,
+    email        VARCHAR(150) DEFAULT NULL,
+    fail_count   INT DEFAULT 1,
+    locked_until DATETIME DEFAULT NULL,
+    last_attempt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uk_ip (ip_address)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- -----------------------------------------------------------
+-- Seed: Data default pengaturan_umum
+-- -----------------------------------------------------------
+INSERT IGNORE INTO pengaturan_umum (key_name, value) VALUES
+    ('app_name',            'Sistem Absensi IoT'),
+    ('entitas_nama',        'UKM'),
+    ('hero_judul',          'SISTEM ABSENSI & MANAJEMEN ORGANISASI'),
+    ('hero_deskripsi',      'Optimalkan efisiensi kehadiran dengan teknologi berbasis Fingerprint + ESP32. Monitoring real-time untuk transparansi organisasi digital.'),
+    ('hero_btn1_label',     'Jelajahi UKM'),
+    ('hero_btn1_link',      'index.php?page=katalog_ukm'),
+    ('hero_btn2_label',     'Dokumentasi API'),
+    ('hero_btn2_link',      'index.php?page=tentang'),
+    ('hero_gambar',         ''),
+    ('hero_overlay_opacity','20');
+
+SET FOREIGN_KEY_CHECKS = 1;
