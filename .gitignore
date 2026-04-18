@@ -1,0 +1,22 @@
+# Configuration & Credentials
+.env
+core/debug.log
+
+# Temporary / Scratch Files
+scratch/
+storage/*
+!storage/.gitkeep
+
+# Uploads (Exclude actual files, keep directory structure)
+uploads/*
+!uploads/.gitkeep
+
+# Hardware Configuration (Secrets)
+hardware/**/config.h
+
+# PHP Vendor (If used)
+/vendor/
+
+# OS Specific
+.DS_Store
+Thumbs.db

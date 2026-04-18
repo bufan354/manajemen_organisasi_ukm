@@ -1,0 +1,20 @@
+# Proteksi file sensitif
+<FilesMatch "^\.env$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Proteksi folder uploads agar tidak bisa eksekusi PHP
+<Directory "uploads">
+    <FilesMatch "\.php$">
+        Order allow,deny
+        Deny from all
+    </FilesMatch>
+</Directory>
+
+# Disable directory listing
+Options -Indexes -MultiViews
+
+RewriteEngine On
+RewriteBase /absensi/
+RewriteRule ^api/fingerprint/(.*)$ api/fingerprint.php?action=$1 [QSA,L]

@@ -1,0 +1,11 @@
+.asymmetric-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 2rem;
+}
+
+@media (max-width: 1024px) {
+    .asymmetric-grid {
+        grid-template-columns: 1fr;
+    }
+}

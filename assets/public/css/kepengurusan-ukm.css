@@ -1,0 +1,4 @@
+.org-line-vertical { width: 2px; background: linear-gradient(to bottom, #d8e2ff, #2170e4); }
+.org-line-horizontal { height: 2px; background: #d8e2ff; }
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }

@@ -1,0 +1,4 @@
+.card-shadow { box-shadow: 0 10px 30px -10px rgba(25, 28, 30, 0.04); }
+.card-shadow:hover { box-shadow: 0 10px 30px -10px rgba(25, 28, 30, 0.08); transform: scale(1.01); transition: all 0.3s ease; }
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
