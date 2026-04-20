@@ -5,10 +5,6 @@
             <span class="material-symbols-outlined text-[18px]">arrow_back</span>
             <span class="text-sm font-bold uppercase tracking-wider">Batalkan</span>
         </a>
-        <a class="flex items-center gap-1 text-slate-500 hover:text-blue-500 transition-colors shrink-0" href="index.php?page=katalog_ukm">
-            <span class="material-symbols-outlined text-[18px]">arrow_back</span>
-            <span class="text-sm font-bold uppercase tracking-wider">Batalkan</span>
-        </a>
         <div class="font-black text-xl text-slate-900 tracking-tight"><?= h($APP_NAME) ?></div>
         <div class="w-[84px]"></div> <!-- Spacer for balancing -->
     </div>
