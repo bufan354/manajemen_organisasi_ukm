@@ -32,7 +32,7 @@ class View {
         require_once "views/layouts/header.php";
         require_once "views/layouts/admin_sidebar.php";
         
-        echo '<div class="ml-[260px] min-h-screen flex flex-col">';
+        echo '<div class="lg:ml-[260px] min-h-screen flex flex-col transition-all duration-300 w-full lg:w-auto">';
         require_once "views/layouts/admin_topbar.php";
         
         if (isset($_SESSION['is_active_periode']) && $_SESSION['is_active_periode'] === false) {

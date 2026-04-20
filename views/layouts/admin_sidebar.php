@@ -47,7 +47,7 @@ function renderNav($id, $item, $currentPage) {
 }
 ?>
 
-<aside class="w-[260px] h-screen fixed left-0 top-0 bg-white dark:bg-slate-900 shadow-[12px_0_40px_rgba(25,28,30,0.06)] flex flex-col py-6 z-50">
+<aside id="admin-sidebar" class="w-[260px] h-screen fixed left-0 top-0 bg-white dark:bg-slate-900 shadow-[12px_0_40px_rgba(25,28,30,0.06)] flex flex-col py-6 z-[60] transition-transform duration-300 -translate-x-full lg:translate-x-0">
     <div class="px-6 mb-8 flex items-center gap-3">
         <div class="w-10 h-10 bg-primary-container rounded-xl flex items-center justify-center overflow-hidden">
             <img class="w-full h-full object-cover" alt="Logo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAbPdqJoliQZsqDJr245pD77Jsr7C1hEvBmXiEfGsLT9raIjkyXBPINjucsZPKePWIPWUXTqmz55rMJFWz6WJQLyhyXyIMamVB7390vmZB98zUSEUeEWLgUvf7nb9QUBmkiQLD3_UZ6iB_2Ztr53Rh3GalAhe1-OpegqfuNx1HZFp7AYQxlExv9uqhWOCqrMl52DiJYQcqSyHbPUOpMjUk5_dWS-LfVtB1hEvKg273Qzb1WvGI8yIDP2_u3rKQ5flrFrqXm6-hM2Lds"/>
@@ -79,3 +79,31 @@ function renderNav($id, $item, $currentPage) {
         </div>
     </nav>
 </aside>
+
+<div id="sidebar-backdrop" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden lg:hidden transition-opacity duration-300 opacity-0 pointer-events-none" onclick="toggleSidebar()"></div>
+
+<script>
+    function toggleSidebar() {
+        const sidebar = document.getElementById('admin-sidebar');
+        const backdrop = document.getElementById('sidebar-backdrop');
+        
+        if (sidebar.classList.contains('-translate-x-full')) {
+            // Open sidebar
+            sidebar.classList.remove('-translate-x-full');
+            backdrop.classList.remove('hidden');
+            // Small delay to allow display:block to apply before transition
+            setTimeout(() => {
+                backdrop.classList.remove('opacity-0', 'pointer-events-none');
+                backdrop.classList.add('opacity-100', 'pointer-events-auto');
+            }, 10);
+        } else {
+            // Close sidebar
+            sidebar.classList.add('-translate-x-full');
+            backdrop.classList.remove('opacity-100', 'pointer-events-auto');
+            backdrop.classList.add('opacity-0', 'pointer-events-none');
+            setTimeout(() => {
+                backdrop.classList.add('hidden');
+            }, 300);
+        }
+    }
+</script>

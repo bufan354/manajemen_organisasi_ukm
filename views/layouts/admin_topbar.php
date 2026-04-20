@@ -1,4 +1,10 @@
-<header class="sticky top-0 w-full z-40 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md flex justify-end items-center px-8 h-16">
+<header class="sticky top-0 w-full z-40 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md flex justify-between lg:justify-end items-center px-6 lg:px-8 h-16">
+    <!-- Hamburger Menu Button (Mobile Only) -->
+    <div class="lg:hidden flex items-center">
+        <button onclick="toggleSidebar()" class="relative cursor-pointer hover:text-blue-600 transition-colors p-2 rounded-xl hover:bg-blue-50 dark:hover:bg-blue-900/30 focus:outline-none flex items-center justify-center -ml-2" title="Toggle Menu" aria-label="Toggle Menu">
+            <span class="material-symbols-outlined text-[24px] text-on-surface-variant">menu</span>
+        </button>
+    </div>
     <div class="flex items-center gap-6">
         <!-- Notification Bell -->
         <div class="relative" id="notif-wrapper">
