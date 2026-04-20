@@ -83,7 +83,7 @@ class PendaftaranController
 
         $data = [
             'ukm_id'             => $ukmId,
-            'periode_id'         => $activePeriode ? $activePeriode['id'] : 0,
+            'periode_id'         => $activePeriode ? $activePeriode['id'] : null, // null agar tidak melanggar FK constraint
             'nama'               => sanitize($_POST['nama'] ?? ''),
             'email'              => sanitize($_POST['email'] ?? ''),
             'no_wa'              => sanitize($_POST['no_wa'] ?? ''),

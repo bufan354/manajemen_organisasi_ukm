@@ -67,7 +67,7 @@ class Pendaftaran
         );
         $stmt->execute([
             $data['ukm_id'],
-            $data['periode_id'] ?? 0,
+            $data['periode_id'] ?? null,  // null-safe: jika tidak ada periode aktif
             $data['nama'],
             $data['email'],
             $data['no_wa'],
