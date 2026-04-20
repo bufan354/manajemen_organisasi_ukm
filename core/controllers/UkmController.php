@@ -64,10 +64,13 @@ class UkmController
         // sehingga tidak perlu setup manual hanya untuk bisa menerima pendaftar.
         require_once 'core/models/Periode.php';
         $tahunIni = (int)date('Y');
+        $bulanIni = (int)date('n');
         $periodeModel = new Periode();
         $periodeModel->add($ukmId, [
             'nama'          => 'Kepengurusan ' . $tahunIni . '/' . ($tahunIni + 1),
+            'bulan_mulai'   => $bulanIni,
             'tahun_mulai'   => $tahunIni,
+            'bulan_selesai' => $bulanIni,
             'tahun_selesai' => $tahunIni + 1,
             'deskripsi'     => 'Periode kepengurusan awal yang dibuat otomatis saat UKM didaftarkan.',
         ]);

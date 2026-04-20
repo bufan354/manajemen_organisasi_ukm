@@ -34,14 +34,16 @@ class Periode
     public function add(int $ukmId, array $data): bool
     {
         $stmt = $this->db->prepare(
-            "INSERT INTO periode (ukm_id, nama, tahun_mulai, tahun_selesai, deskripsi, is_active) 
-             VALUES (?, ?, ?, ?, ?, 0)"
+            "INSERT INTO periode (ukm_id, nama, tahun_mulai, bulan_mulai, tahun_selesai, bulan_selesai, deskripsi, is_active) 
+             VALUES (?, ?, ?, ?, ?, ?, ?, 0)"
         );
         return $stmt->execute([
             $ukmId,
             $data['nama'],
             $data['tahun_mulai'],
+            $data['bulan_mulai'] ?? null,
             $data['tahun_selesai'],
+            $data['bulan_selesai'] ?? null,
             $data['deskripsi'] ?? null
         ]);
     }
@@ -50,13 +52,15 @@ class Periode
     {
         $stmt = $this->db->prepare(
             "UPDATE periode 
-             SET nama = ?, tahun_mulai = ?, tahun_selesai = ?, deskripsi = ?
+             SET nama = ?, tahun_mulai = ?, bulan_mulai = ?, tahun_selesai = ?, bulan_selesai = ?, deskripsi = ?
              WHERE id = ?"
         );
         return $stmt->execute([
             $data['nama'],
             $data['tahun_mulai'],
+            $data['bulan_mulai'] ?? null,
             $data['tahun_selesai'],
+            $data['bulan_selesai'] ?? null,
             $data['deskripsi'] ?? null,
             $id
         ]);

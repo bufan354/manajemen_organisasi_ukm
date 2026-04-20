@@ -73,7 +73,12 @@
                         <td class="p-5 font-bold text-on-surface text-base"><?= htmlspecialchars($pr['nama']) ?></td>
                         <td class="p-5">
                             <span class="bg-surface-container-high px-2.5 py-1 rounded-md text-xs font-mono font-bold text-on-surface-variant">
-                                <?= htmlspecialchars($pr['tahun_mulai']) ?> - <?= htmlspecialchars($pr['tahun_selesai']) ?>
+                                <?php
+                                $bulan = [1=>'Jan',2=>'Feb',3=>'Mar',4=>'Apr',5=>'Mei',6=>'Jun',7=>'Jul',8=>'Ags',9=>'Sep',10=>'Okt',11=>'Nov',12=>'Des'];
+                                $m_mulai = isset($pr['bulan_mulai']) && $pr['bulan_mulai'] ? $bulan[$pr['bulan_mulai']] . ' ' : '';
+                                $m_selesai = isset($pr['bulan_selesai'])  && $pr['bulan_selesai'] ? $bulan[$pr['bulan_selesai']] . ' ' : '';
+                                echo $m_mulai . htmlspecialchars($pr['tahun_mulai']) . ' - ' . $m_selesai . htmlspecialchars($pr['tahun_selesai']);
+                                ?>
                             </span>
                         </td>
                         <td class="p-5 text-on-surface-variant/80 text-xs italic max-w-xs truncate">
@@ -134,12 +139,30 @@
             </div>
             <div class="grid grid-cols-2 gap-5 mb-5">
                 <div>
-                    <label class="block text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mb-2">Tahun Mulai</label>
-                    <input type="number" name="tahun_mulai" required value="<?= date('Y') ?>" class="w-full bg-surface-container-highest border-none rounded-xl px-4 py-3 text-sm focus:ring-0 focus:border-b-2 border-b-2 border-transparent focus:border-b-primary transition-all">
+                    <label class="block text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mb-2">Bulan/Tahun Mulai</label>
+                    <div class="flex gap-2">
+                        <select name="bulan_mulai" required class="w-1/2 bg-surface-container-highest border-none rounded-xl px-4 py-3 text-sm focus:ring-0 focus:border-b-2 border-b-2 border-transparent focus:border-b-primary transition-all">
+                            <?php 
+                            $nmBulan = [1=>'Januari',2=>'Februari',3=>'Maret',4=>'April',5=>'Mei',6=>'Juni',7=>'Juli',8=>'Agustus',9=>'September',10=>'Oktober',11=>'November',12=>'Desember'];
+                            foreach($nmBulan as $n=>$b) { 
+                                $sel = $n == date('n') ? 'selected' : '';
+                                echo "<option value='$n' $sel>$b</option>";
+                            } ?>
+                        </select>
+                        <input type="number" name="tahun_mulai" required value="<?= date('Y') ?>" class="w-1/2 bg-surface-container-highest border-none rounded-xl px-4 py-3 text-sm focus:ring-0 focus:border-b-2 border-b-2 border-transparent focus:border-b-primary transition-all">
+                    </div>
                 </div>
                 <div>
-                    <label class="block text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mb-2">Tahun Selesai</label>
-                    <input type="number" name="tahun_selesai" required value="<?= date('Y') + 1 ?>" class="w-full bg-surface-container-highest border-none rounded-xl px-4 py-3 text-sm focus:ring-0 focus:border-b-2 border-b-2 border-transparent focus:border-b-primary transition-all">
+                    <label class="block text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mb-2">Bulan/Tahun Selesai</label>
+                    <div class="flex gap-2">
+                        <select name="bulan_selesai" required class="w-1/2 bg-surface-container-highest border-none rounded-xl px-4 py-3 text-sm focus:ring-0 focus:border-b-2 border-b-2 border-transparent focus:border-b-primary transition-all">
+                            <?php foreach($nmBulan as $n=>$b) { 
+                                $sel = $n == date('n') ? 'selected' : '';
+                                echo "<option value='$n' $sel>$b</option>";
+                            } ?>
+                        </select>
+                        <input type="number" name="tahun_selesai" required value="<?= date('Y') + 1 ?>" class="w-1/2 bg-surface-container-highest border-none rounded-xl px-4 py-3 text-sm focus:ring-0 focus:border-b-2 border-b-2 border-transparent focus:border-b-primary transition-all">
+                    </div>
                 </div>
             </div>
             <div class="mb-6">
@@ -174,12 +197,22 @@
             </div>
             <div class="grid grid-cols-2 gap-5 mb-5">
                 <div>
-                    <label class="block text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mb-2">Tahun Mulai</label>
-                    <input type="number" name="tahun_mulai" id="edit_tahun_mulai" required class="w-full bg-surface-container-highest border-none rounded-xl px-4 py-3 text-sm focus:ring-0 focus:border-b-2 border-b-2 border-transparent focus:border-b-primary transition-all">
+                    <label class="block text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mb-2">Bulan/Tahun Mulai</label>
+                    <div class="flex gap-2">
+                        <select name="bulan_mulai" id="edit_bulan_mulai" required class="w-1/2 bg-surface-container-highest border-none rounded-xl px-4 py-3 text-sm focus:ring-0 focus:border-b-2 border-b-2 border-transparent focus:border-b-primary transition-all">
+                            <?php foreach($nmBulan as $n=>$b) { echo "<option value='$n'>$b</option>"; } ?>
+                        </select>
+                        <input type="number" name="tahun_mulai" id="edit_tahun_mulai" required class="w-1/2 bg-surface-container-highest border-none rounded-xl px-4 py-3 text-sm focus:ring-0 focus:border-b-2 border-b-2 border-transparent focus:border-b-primary transition-all">
+                    </div>
                 </div>
                 <div>
-                    <label class="block text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mb-2">Tahun Selesai</label>
-                    <input type="number" name="tahun_selesai" id="edit_tahun_selesai" required class="w-full bg-surface-container-highest border-none rounded-xl px-4 py-3 text-sm focus:ring-0 focus:border-b-2 border-b-2 border-transparent focus:border-b-primary transition-all">
+                    <label class="block text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mb-2">Bulan/Tahun Selesai</label>
+                    <div class="flex gap-2">
+                        <select name="bulan_selesai" id="edit_bulan_selesai" required class="w-1/2 bg-surface-container-highest border-none rounded-xl px-4 py-3 text-sm focus:ring-0 focus:border-b-2 border-b-2 border-transparent focus:border-b-primary transition-all">
+                            <?php foreach($nmBulan as $n=>$b) { echo "<option value='$n'>$b</option>"; } ?>
+                        </select>
+                        <input type="number" name="tahun_selesai" id="edit_tahun_selesai" required class="w-1/2 bg-surface-container-highest border-none rounded-xl px-4 py-3 text-sm focus:ring-0 focus:border-b-2 border-b-2 border-transparent focus:border-b-primary transition-all">
+                    </div>
                 </div>
             </div>
             <div class="mb-6">
@@ -198,7 +231,9 @@ function editPeriode(pr) {
     document.getElementById('edit_id').value = pr.id;
     document.getElementById('edit_nama').value = pr.nama;
     document.getElementById('edit_tahun_mulai').value = pr.tahun_mulai;
+    if (pr.bulan_mulai) document.getElementById('edit_bulan_mulai').value = pr.bulan_mulai;
     document.getElementById('edit_tahun_selesai').value = pr.tahun_selesai;
+    if (pr.bulan_selesai) document.getElementById('edit_bulan_selesai').value = pr.bulan_selesai;
     document.getElementById('edit_deskripsi').value = pr.deskripsi || '';
     document.getElementById('modalEdit').classList.remove('hidden');
 }

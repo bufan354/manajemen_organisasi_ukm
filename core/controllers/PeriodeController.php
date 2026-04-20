@@ -24,7 +24,9 @@ class PeriodeController
         $ukmId = (int)($_POST['ukm_id'] ?? 0);
         $data = [
             'nama' => sanitize($_POST['nama'] ?? ''),
+            'bulan_mulai' => (int)($_POST['bulan_mulai'] ?? 1),
             'tahun_mulai' => (int)($_POST['tahun_mulai'] ?? 0),
+            'bulan_selesai' => (int)($_POST['bulan_selesai'] ?? 12),
             'tahun_selesai' => (int)($_POST['tahun_selesai'] ?? 0),
             'deskripsi' => sanitize($_POST['deskripsi'] ?? '')
         ];
@@ -48,7 +50,9 @@ class PeriodeController
         $ukmId = (int)($_POST['ukm_id'] ?? 0);
         $data = [
             'nama' => sanitize($_POST['nama'] ?? ''),
+            'bulan_mulai' => (int)($_POST['bulan_mulai'] ?? 1),
             'tahun_mulai' => (int)($_POST['tahun_mulai'] ?? 0),
+            'bulan_selesai' => (int)($_POST['bulan_selesai'] ?? 12),
             'tahun_selesai' => (int)($_POST['tahun_selesai'] ?? 0),
             'deskripsi' => sanitize($_POST['deskripsi'] ?? '')
         ];
