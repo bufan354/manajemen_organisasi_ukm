@@ -104,6 +104,21 @@
                     </div>
                 <?php else: ?>
                 
+                <?php if ($targetUkmId > 0 && isset($hasPeriodeAktif) && !$hasPeriodeAktif): ?>
+                <div class="mx-8 mt-8 flex items-start gap-4 bg-amber-50 border border-amber-200 rounded-2xl p-5">
+                    <div class="shrink-0 w-10 h-10 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[22px]" style="font-variation-settings: 'FILL' 1;">warning</span>
+                    </div>
+                    <div>
+                        <p class="font-bold text-amber-900 text-sm">UKM Ini Belum Memiliki Periode Kepengurusan Aktif</p>
+                        <p class="text-amber-800 text-sm mt-1 leading-relaxed">
+                            Pendaftaranmu akan tetap tercatat, namun kamu mungkin tidak langsung dimasukkan ke daftar anggota aktif. 
+                            Admin UKM perlu mengaktifkan periode kepengurusan terlebih dahulu. Kamu tetap bisa mendaftar sekarang.
+                        </p>
+                    </div>
+                </div>
+                <?php endif; ?>
+
                 <form id="registration-form" action="index.php?action=pendaftaran_register" method="POST">
     <?= csrf_field() ?>
                     

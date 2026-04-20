@@ -106,6 +106,9 @@ class PendaftaranController
         foreach ($settingsRaw as $row) { $settingsMap[$row['kunci']] = $row['nilai']; }
         $instruction = $settingsMap['form_reg_instruction'] ?? 'Pendaftaran berhasil dikirim! Silakan tunggu verifikasi admin.';
 
+        // Jika tidak ada periode aktif, tetap proses pendaftaran tapi tandai dengan catatan
+        $noPeriodeWarning = !$activePeriode;
+
         $data['session_id'] = session_id();
         $this->model->create($data);
 
@@ -132,6 +135,11 @@ class PendaftaranController
             addNotifikasi($sa['id'], 'pendaftaran_baru', $judulNotif, "Pendaftaran baru dari {$data['nama']} di {$ukmNama} – segera verifikasi.", $linkNotif, null);
         }
         // -------------------------------------------
+
+        // Tambahkan catatan jika tidak ada periode aktif
+        if ($noPeriodeWarning) {
+            $instruction .= ' ⚠️ Catatan: UKM ini saat ini belum memiliki periode kepengurusan aktif. Pendaftaranmu tetap tercatat dan akan diproses saat admin mengaktifkan periode baru.';
+        }
 
         setFlash('success', $instruction);
         redirect('index.php?page=daftar_sukses');

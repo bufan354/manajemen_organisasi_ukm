@@ -572,15 +572,18 @@ switch ($page) {
         require_once 'core/models/Ukm.php';
         require_once 'core/models/Pendaftaran.php';
         require_once 'core/models/Pengaturan.php';
+        require_once 'core/models/Periode.php';
         
         $ukmModel = new Ukm();
         $pendaftaranModel = new Pendaftaran();
         $pengaturanModel = new Pengaturan();
+        $periodeModel = new Periode();
         
         $targetUkmId = (int)($_GET['ukm_id'] ?? 0);
         
         $riwayatPendaftaran = null;
         $settingsMap = [];
+        $hasPeriodeAktif = true; // default: anggap ada, supaya tidak tampil warning kalau UKM belum dipilih
         if ($targetUkmId > 0) {
             $riwayatPendaftaran = $pendaftaranModel->getLatestBySession(session_id(), $targetUkmId);
             
@@ -592,6 +595,10 @@ switch ($page) {
             foreach ($settingsRaw as $row) {
                 $settingsMap[$row['kunci']] = $row['nilai'];
             }
+
+            // Cek apakah UKM punya periode aktif
+            $activePeriode = $periodeModel->getActive($targetUkmId);
+            $hasPeriodeAktif = (bool) $activePeriode;
         }
 
         View::renderPublic('public/daftar_anggota', [
@@ -599,7 +606,8 @@ switch ($page) {
             'ukmList'            => $ukmModel->getActive(),
             'targetUkmId'        => $targetUkmId,
             'riwayatPendaftaran' => $riwayatPendaftaran,
-            'settings'           => $settingsMap
+            'settings'           => $settingsMap,
+            'hasPeriodeAktif'    => $hasPeriodeAktif,
         ]);
         break;
 
