@@ -46,9 +46,22 @@ if ($action) {
         $token = $_POST['csrf_token'] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? null;
         if (!Session::validateCsrf($token)) {
             logSecurityActivity('CSRF Violation Attempted', ['action' => $action]);
-            header('Content-Type: application/json');
-            echo json_encode(['success' => false, 'error' => 'Sesi tidak valid (CSRF Token mismatch). Silakan refresh halaman.']);
-            exit;
+
+            // Deteksi apakah request dari AJAX (fetch/XMLHttpRequest)
+            $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH'])
+                   || !empty($_SERVER['HTTP_X_CSRF_TOKEN'])
+                   || ($_SERVER['HTTP_ACCEPT'] ?? '') === 'application/json';
+
+            if ($isAjax) {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'error' => 'Sesi tidak valid (CSRF Token mismatch). Silakan refresh halaman.']);
+                exit;
+            }
+
+            // Untuk form submission biasa: redirect kembali dengan flash error
+            setFlash('error', 'Sesi keamanan tidak valid atau sudah berakhir. Silakan refresh halaman dan coba lagi.');
+            $referer = $_SERVER['HTTP_REFERER'] ?? 'index.php?page=dashboard';
+            redirect($referer);
         }
     }
 

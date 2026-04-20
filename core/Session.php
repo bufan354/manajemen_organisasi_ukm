@@ -8,17 +8,23 @@ class Session
     public static function start(): void
     {
         if (session_status() === PHP_SESSION_NONE) {
-            // Hardened session cookie settings
             $timeout = 1800; // 30 minutes
+
+            // Deteksi HTTPS dengan benar di balik reverse proxy (Nginx → PHP-FPM).
+            // Nginx tidak meneruskan $_SERVER['HTTPS'], melainkan lewat X-Forwarded-Proto.
+            $isHttps = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off'
+                    || ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https'
+                    || ($_SERVER['HTTP_X_FORWARDED_SSL'] ?? '') === 'on';
+
             session_set_cookie_params([
                 'lifetime' => $timeout,
                 'path'     => '/',
                 'domain'   => '',
-                'secure'   => isset($_SERVER['HTTPS']),
+                'secure'   => $isHttps,
                 'httponly' => true,
-                'samesite' => 'Lax'
+                'samesite' => 'Lax',
             ]);
-            
+
             ini_set('session.gc_maxlifetime', $timeout);
             session_start();
         }

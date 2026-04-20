@@ -57,9 +57,29 @@ class UkmController
             if ($path) $data['header_path'] = $path;
         }
 
-        $this->model->create($data);
+        $ukmId = $this->model->create($data);
+
+        // ── Auto-create periode kepengurusan pertama ───────────────────────
+        // Setiap UKM baru langsung punya 1 periode aktif (tahun berjalan),
+        // sehingga tidak perlu setup manual hanya untuk bisa menerima pendaftar.
+        require_once 'core/models/Periode.php';
+        $tahunIni = (int)date('Y');
+        $periodeModel = new Periode();
+        $periodeModel->add($ukmId, [
+            'nama'          => 'Kepengurusan ' . $tahunIni . '/' . ($tahunIni + 1),
+            'tahun_mulai'   => $tahunIni,
+            'tahun_selesai' => $tahunIni + 1,
+            'deskripsi'     => 'Periode kepengurusan awal yang dibuat otomatis saat UKM didaftarkan.',
+        ]);
+        // Ambil ID periode yang baru dibuat lalu aktifkan
+        $periodes = $periodeModel->getAll($ukmId);
+        if (!empty($periodes)) {
+            $periodeModel->setActive($ukmId, $periodes[0]['id']);
+        }
+        // ──────────────────────────────────────────────────────────────────
+
         logSecurityActivity('Tambah Data UKM Baru', ['ukm' => $data['nama']]);
-        setFlash('success', 'UKM berhasil ditambahkan.');
+        setFlash('success', 'UKM berhasil ditambahkan beserta periode kepengurusan awal.');
         redirect('index.php?page=ukm');
     }
 
