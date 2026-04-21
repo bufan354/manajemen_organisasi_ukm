@@ -193,9 +193,23 @@
                         </td>
                         <td class="px-6 py-5">
                             <?php if (!empty($ev['status_absensi'])): ?>
-                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-secondary-container text-on-secondary-container text-[10px] font-bold uppercase tracking-wider">
-                                <span class="w-1 h-1 rounded-full bg-current"></span> Aktif
-                            </span>
+                                <?php
+                                $now = time();
+                                $start = strtotime($ev['waktu_mulai']);
+                                $end = !empty($ev['waktu_selesai']) ? strtotime($ev['waktu_selesai']) : null;
+                                if ($now < $start): ?>
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-700 text-[10px] font-bold uppercase tracking-wider" title="ESP32 belum buka absen karena waktu belum tiba">
+                                        <span class="material-symbols-outlined text-[10px] font-bold">schedule</span> Menunggu Jam
+                                    </span>
+                                <?php elseif ($end && $now > $end): ?>
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-500 text-[10px] font-bold uppercase tracking-wider" title="Waktu absensi telah lewat">
+                                        Waktu Habis
+                                    </span>
+                                <?php else: ?>
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-secondary-container text-on-secondary-container text-[10px] font-bold uppercase tracking-wider" title="ESP32 sedang membuka absensi">
+                                        <span class="w-1 h-1 rounded-full bg-current animate-pulse"></span> Aktif
+                                    </span>
+                                <?php endif; ?>
                             <?php else: ?>
                             <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-500 text-[10px] font-bold uppercase tracking-wider">
                                 Non-Aktif

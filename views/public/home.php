@@ -78,11 +78,11 @@ $_judulBaris2 = isset($_judulParts[1]) ? trim($_judulParts[1]) : '';
         </div>
         
         <!-- Live Activity Monitor Chart -->
-        <!-- <div class="mb-16 bg-surface-container-lowest p-6 md:p-8 rounded-[2rem] shadow-sm border border-outline-variant/10">
+        <div class="mb-16 bg-surface-container-lowest p-6 md:p-8 rounded-[2rem] shadow-sm border border-outline-variant/10">
             <div class="h-[300px] w-full">
                 <canvas id="ukmChart"></canvas>
             </div>
-        </div> -->
+        </div>
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <?php if (empty($ukmList)): ?>

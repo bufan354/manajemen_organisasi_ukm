@@ -44,10 +44,29 @@ foreach ($kehadiranList as $k) {
                 </div>
                 <div>
                     <h3 class="font-bold text-lg text-slate-900"><?= htmlspecialchars($ev['nama'] ?? '-') ?></h3>
-                    <p class="text-sm text-slate-500 mt-1">
-                        <span class="material-symbols-outlined text-xs align-middle">schedule</span>
-                        <?= date('d M Y, H:i', strtotime($ev['waktu_mulai'] ?? 'now')) ?> – <?= date('H:i', strtotime($ev['waktu_selesai'] ?? 'now')) ?>
-                    </p>
+                    <div class="flex items-center gap-2 mt-1">
+                        <p class="text-sm text-slate-500">
+                            <span class="material-symbols-outlined text-xs align-middle">schedule</span>
+                            <?= date('d M Y, H:i', strtotime($ev['waktu_mulai'] ?? 'now')) ?> – <?= date('H:i', strtotime($ev['waktu_selesai'] ?? 'now')) ?>
+                        </p>
+                        <?php
+                        if (!empty($ev['status_absensi'])) {
+                            $now = time();
+                            $start = strtotime($ev['waktu_mulai'] ?? 'now');
+                            $end = !empty($ev['waktu_selesai']) ? strtotime($ev['waktu_selesai']) : null;
+                            
+                            if ($now < $start) {
+                                echo '<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-700 uppercase">Menunggu Jam</span>';
+                            } elseif ($end && $now > $end) {
+                                echo '<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-500 uppercase">Waktu Habis</span>';
+                            } else {
+                                echo '<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-700 uppercase"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse mr-1"></span> Absen Terbuka</span>';
+                            }
+                        } else {
+                            echo '<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-500 uppercase">Non-Aktif</span>';
+                        }
+                        ?>
+                    </div>
                     <?php if (!empty($ev['lokasi'])): ?>
                     <p class="text-sm text-slate-500">
                         <span class="material-symbols-outlined text-xs align-middle">location_on</span>
