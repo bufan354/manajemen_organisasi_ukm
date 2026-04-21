@@ -60,10 +60,17 @@
                 <?php 
                 $isRoutine = !empty($ev['is_routine']); 
                 $hariArr = explode(',', $ev['hari_rutin'] ?? '');
-                $jamMulai = ''; $jamSelesai = '';
+                $jamMulai = ''; 
+                $durasiMenit = 120; // Default 2 Jam
+                
+                if (!empty($ev['waktu_mulai']) && !empty($ev['waktu_selesai'])) {
+                    $startTs = strtotime($ev['waktu_mulai']);
+                    $endTs = strtotime($ev['waktu_selesai']);
+                    $durasiMenit = round(($endTs - $startTs) / 60);
+                }
+
                 if ($isRoutine) {
                     $jamMulai = !empty($ev['waktu_mulai']) ? date('H:i', strtotime($ev['waktu_mulai'])) : '';
-                    $jamSelesai = !empty($ev['waktu_selesai']) ? date('H:i', strtotime($ev['waktu_selesai'])) : '';
                 }
                 ?>
 
@@ -95,8 +102,19 @@
                         <input name="waktu_mulai" class="w-full bg-surface-container-high/40 border-none rounded-xl py-3 px-4 focus:ring-2 focus:ring-primary/20 text-sm text-slate-800 font-medium" type="datetime-local" value="<?= !$isRoutine && !empty($ev['waktu_mulai']) ? date('Y-m-d\TH:i', strtotime($ev['waktu_mulai'])) : '' ?>"/>
                     </div>
                     <div class="space-y-2">
-                        <label class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Waktu Berakhir</label>
-                        <input name="waktu_selesai" class="w-full bg-surface-container-high/40 border-none rounded-xl py-3 px-4 focus:ring-2 focus:ring-primary/20 text-sm text-slate-800 font-medium" type="datetime-local" value="<?= !$isRoutine && !empty($ev['waktu_selesai']) ? date('Y-m-d\TH:i', strtotime($ev['waktu_selesai'])) : '' ?>"/>
+                        <label class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Durasi Kegiatan</label>
+                        <select name="durasi" class="w-full bg-surface-container-high/40 border-none rounded-xl py-3 px-4 focus:ring-2 focus:ring-primary/20 text-sm text-slate-800 font-medium">
+                            <option value="30" <?= $durasiMenit == 30 ? 'selected' : '' ?>>30 Menit</option>
+                            <option value="60" <?= $durasiMenit == 60 ? 'selected' : '' ?>>1 Jam</option>
+                            <option value="90" <?= $durasiMenit == 90 ? 'selected' : '' ?>>1.5 Jam</option>
+                            <option value="120" <?= $durasiMenit == 120 ? 'selected' : (!in_array($durasiMenit, [30,60,90,150,180,240,300,360,480]) && $durasiMenit != 120 ? 'selected' : '') ?>>2 Jam</option>
+                            <option value="150" <?= $durasiMenit == 150 ? 'selected' : '' ?>>2.5 Jam</option>
+                            <option value="180" <?= $durasiMenit == 180 ? 'selected' : '' ?>>3 Jam</option>
+                            <option value="240" <?= $durasiMenit == 240 ? 'selected' : '' ?>>4 Jam</option>
+                            <option value="300" <?= $durasiMenit == 300 ? 'selected' : '' ?>>5 Jam</option>
+                            <option value="360" <?= $durasiMenit == 360 ? 'selected' : '' ?>>6 Jam</option>
+                            <option value="480" <?= $durasiMenit == 480 ? 'selected' : '' ?>>8 Jam</option>
+                        </select>
                     </div>
                 </div>
 
@@ -124,8 +142,17 @@
                             <input name="jam_mulai" class="w-full bg-surface-container-high/40 border-none rounded-xl py-3 px-4 focus:ring-2 focus:ring-primary/20 text-sm text-slate-800 font-medium routine-input" type="time" value="<?= $jamMulai ?>"/>
                         </div>
                         <div class="space-y-2">
-                            <label class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Jam Berakhir</label>
-                            <input name="jam_selesai" class="w-full bg-surface-container-high/40 border-none rounded-xl py-3 px-4 focus:ring-2 focus:ring-primary/20 text-sm text-slate-800 font-medium routine-input" type="time" value="<?= $jamSelesai ?>"/>
+                            <label class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Durasi Pertemuan (Mingguan)</label>
+                            <select name="durasi_rutin" class="w-full bg-surface-container-high/40 border-none rounded-xl py-3 px-4 focus:ring-2 focus:ring-primary/20 text-sm text-slate-800 font-medium routine-input">
+                                <option value="30" <?= $durasiMenit == 30 ? 'selected' : '' ?>>30 Menit</option>
+                                <option value="60" <?= $durasiMenit == 60 ? 'selected' : '' ?>>1 Jam</option>
+                                <option value="90" <?= $durasiMenit == 90 ? 'selected' : '' ?>>1.5 Jam</option>
+                                <option value="120" <?= $durasiMenit == 120 ? 'selected' : (!in_array($durasiMenit, [30,60,90,150,180,240,300,360,480]) && $durasiMenit != 120 ? 'selected' : '') ?>>2 Jam</option>
+                                <option value="150" <?= $durasiMenit == 150 ? 'selected' : '' ?>>2.5 Jam</option>
+                                <option value="180" <?= $durasiMenit == 180 ? 'selected' : '' ?>>3 Jam</option>
+                                <option value="240" <?= $durasiMenit == 240 ? 'selected' : '' ?>>4 Jam</option>
+                                <option value="300" <?= $durasiMenit == 300 ? 'selected' : '' ?>>5 Jam</option>
+                            </select>
                         </div>
                     </div>
                 </div>

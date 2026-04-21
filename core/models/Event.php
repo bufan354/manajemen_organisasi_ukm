@@ -229,40 +229,45 @@ class Event
     /** JIT Generator: Mengeluarkan Anak-anak Rutin Pada Hari H */
     public function generateRoutineEvents(): void
     {
-        $today = date('w'); // 0 (Minggu) sampai 6 (Sabtu)
-        $curDate = date('Y-m-d');
-        
+        // Ambil semua master rutinitas yang aktif
         $stmt = $this->db->query("SELECT * FROM events WHERE is_routine = 1 AND status_absensi = 1");
         $masters = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
-        foreach ($masters as $master) {
-            $hariList = explode(',', $master['hari_rutin'] ?? '');
-            if (in_array((string)$today, $hariList, true)) {
+        // Ciptakan jendela masa depan (Rolling Window: H-0 sampai H+7)
+        for ($i = 0; $i <= 7; $i++) {
+            $targetDate = date('Y-m-d', strtotime("+$i days"));
+            $dayOfWeek = date('w', strtotime($targetDate)); // 0 (Minggu) sampai 6 (Sabtu)
+
+            foreach ($masters as $master) {
+                $hariList = explode(',', $master['hari_rutin'] ?? '');
                 
-                // Cek apakah hari ini sudah ada anak (parent_id = master_id, tgl = curDate)
-                $check = $this->db->prepare("SELECT id FROM events WHERE parent_id = ? AND DATE(waktu_mulai) = ?");
-                $check->execute([$master['id'], $curDate]);
-                
-                if (!$check->fetch()) {
-                    $jamMulai = date('H:i:s', strtotime($master['waktu_mulai']));
-                    $jamSelesai = date('H:i:s', strtotime($master['waktu_selesai']));
+                // Jika jadwal master jatuh pada hari tersebut
+                if (in_array((string)$dayOfWeek, $hariList, true)) {
+                    // Cek apakah di tanggal tersebut anak sudah diciptakan
+                    $check = $this->db->prepare("SELECT id FROM events WHERE parent_id = ? AND DATE(waktu_mulai) = ?");
+                    $check->execute([$master['id'], $targetDate]);
                     
-                    $namaAnak = $master['nama'] . ' - ' . date('d M Y');
-                    
-                    $insert = $this->db->prepare(
-                        "INSERT INTO events (ukm_id, is_routine, parent_id, nama, deskripsi, waktu_mulai, waktu_selesai, lokasi, status_absensi) 
-                         VALUES (?, 0, ?, ?, ?, ?, ?, ?, ?)"
-                    );
-                    $insert->execute([
-                        $master['ukm_id'],
-                        $master['id'],
-                        $namaAnak,
-                        $master['deskripsi'],
-                        $curDate . ' ' . $jamMulai,
-                        $curDate . ' ' . $jamSelesai,
-                        $master['lokasi'],
-                        1 // Buka absen otomatis karena masternya 1
-                    ]);
+                    if (!$check->fetch()) {
+                        $jamMulai = date('H:i:s', strtotime($master['waktu_mulai']));
+                        $jamSelesai = date('H:i:s', strtotime($master['waktu_selesai']));
+                        
+                        $namaAnak = $master['nama'] . ' - ' . date('d M Y', strtotime($targetDate));
+                        
+                        $insert = $this->db->prepare(
+                            "INSERT INTO events (ukm_id, is_routine, parent_id, nama, deskripsi, waktu_mulai, waktu_selesai, lokasi, status_absensi) 
+                             VALUES (?, 0, ?, ?, ?, ?, ?, ?, ?)"
+                        );
+                        $insert->execute([
+                            $master['ukm_id'],
+                            $master['id'],
+                            $namaAnak,
+                            $master['deskripsi'],
+                            $targetDate . ' ' . $jamMulai,
+                            $targetDate . ' ' . $jamSelesai,
+                            $master['lokasi'],
+                            1 // Buka absen otomatis karena masternya aktif
+                        ]);
+                    }
                 }
             }
         }

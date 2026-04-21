@@ -38,7 +38,9 @@ class EventController
             // Jika rutin, input waktu adalah tipe time 'HH:MM'
             // Kita gabungkan dengan tanggal dummy
             $waktuMulai = '2000-01-01 ' . ($_POST['jam_mulai'] ?? '00:00') . ':00';
-            $waktuSelesai = '2000-01-01 ' . ($_POST['jam_selesai'] ?? '00:00') . ':00';
+            
+            $durasiRutin = (int)($_POST['durasi_rutin'] ?? 120);
+            $waktuSelesai = date('Y-m-d H:i:s', strtotime($waktuMulai . " + {$durasiRutin} minutes"));
             
             if (isset($_POST['hari']) && is_array($_POST['hari'])) {
                 $hariRutin = implode(',', $_POST['hari']);
@@ -46,9 +48,10 @@ class EventController
         } else {
             // konversi T delimiter dari datetime-local
             $waktuMulai = str_replace('T', ' ', $waktuMulai);
-            $waktuSelesai = str_replace('T', ' ', $waktuSelesai);
             if (strlen($waktuMulai) == 16) $waktuMulai .= ':00';
-            if (strlen($waktuSelesai) == 16) $waktuSelesai .= ':00';
+            
+            $durasi = (int)($_POST['durasi'] ?? 120);
+            $waktuSelesai = date('Y-m-d H:i:s', strtotime($waktuMulai . " + {$durasi} minutes"));
         }
 
         $data = [
@@ -138,16 +141,18 @@ class EventController
 
         if ($isRoutine) {
             $waktuMulai = '2000-01-01 ' . ($_POST['jam_mulai'] ?? '00:00') . ':00';
-            $waktuSelesai = '2000-01-01 ' . ($_POST['jam_selesai'] ?? '00:00') . ':00';
+            $durasiRutin = (int)($_POST['durasi_rutin'] ?? 120);
+            $waktuSelesai = date('Y-m-d H:i:s', strtotime($waktuMulai . " + {$durasiRutin} minutes"));
             
             if (isset($_POST['hari']) && is_array($_POST['hari'])) {
                 $hariRutin = implode(',', $_POST['hari']);
             }
         } else {
             $waktuMulai = str_replace('T', ' ', $waktuMulai);
-            $waktuSelesai = str_replace('T', ' ', $waktuSelesai);
             if (strlen($waktuMulai) == 16) $waktuMulai .= ':00';
-            if (strlen($waktuSelesai) == 16) $waktuSelesai .= ':00';
+            
+            $durasi = (int)($_POST['durasi'] ?? 120);
+            $waktuSelesai = date('Y-m-d H:i:s', strtotime($waktuMulai . " + {$durasi} minutes"));
         }
 
         $data = [
@@ -408,7 +413,7 @@ class EventController
 
         $id = (int)($_POST['id'] ?? 0);
         $waktuMulai = $_POST['waktu_mulai'] ?? '';
-        $waktuSelesai = $_POST['waktu_selesai'] ?? '';
+        $durasi = (int)($_POST['durasi'] ?? 120);
         $alasan = sanitize($_POST['alasan'] ?? '');
 
         $event = $this->model->getById($id);
@@ -419,9 +424,8 @@ class EventController
 
         // Format times
         $waktuMulai = str_replace('T', ' ', $waktuMulai);
-        $waktuSelesai = str_replace('T', ' ', $waktuSelesai);
         if (strlen($waktuMulai) == 16) $waktuMulai .= ':00';
-        if (strlen($waktuSelesai) == 16) $waktuSelesai .= ':00';
+        $waktuSelesai = date('Y-m-d H:i:s', strtotime($waktuMulai . " + {$durasi} minutes"));
 
         $this->model->updateStatus($id, 'postponed', $alasan, [
             'waktu_mulai' => $waktuMulai,
@@ -492,6 +496,44 @@ class EventController
         $_SESSION['redaksi_to_copy'] = $redaksi;
 
         setFlash('success', 'Kegiatan berhasil dibatalkan.');
+        redirect('index.php?page=event');
+    }
+
+    /** Generate ulang redaksi untuk kegiatan tanpa mengedit status */
+    public function generateRedaksi(): void
+    {
+        Session::requireLogin();
+        $id = (int)($_GET['id'] ?? 0);
+        
+        $event = $this->model->getById($id);
+        if (!$event) {
+            setFlash('error', 'Kegiatan tidak ditemukan.');
+            redirect('index.php?page=event');
+        }
+
+        require_once __DIR__ . '/../models/Ukm.php';
+        $ukmData = (new Ukm())->getById($event['ukm_id']);
+        $ukmName = $ukmData ? ($ukmData['singkatan'] ?: $ukmData['nama']) : 'UKM';
+
+        $timestamp = strtotime($event['waktu_mulai']);
+        $hariIndoMap = ['Monday' => 'Senin', 'Tuesday' => 'Selasa', 'Wednesday' => 'Rabu', 'Thursday' => 'Kamis', 'Friday' => 'Jumat', 'Saturday' => 'Sabtu', 'Sunday' => 'Minggu'];
+        $hariIndo = $hariIndoMap[date('l', $timestamp)] ?? date('l', $timestamp);
+        $waktuLengkap = $hariIndo . ", " . date('d M Y', $timestamp) . " Jam " . date('H:i', $timestamp) . " WIB";
+
+        $redaksi = "📢 [PENGINGAT KEGIATAN: {$ukmName}] 📢\n\n";
+        $redaksi .= "Halo Rekan-rekan! 👋\n";
+        $redaksi .= "Jangan lupa untuk menghadiri kegiatan kita:\n\n";
+        $redaksi .= "📌 Nama Kegiatan: {$event['nama']}\n";
+        if ($event['deskripsi']) $redaksi .= "📝 Deskripsi: {$event['deskripsi']}\n";
+        $redaksi .= "📅 Waktu: {$waktuLengkap}\n";
+        $redaksi .= "📍 Lokasi: {$event['lokasi']}\n\n";
+        $redaksi .= "Mohon kehadirannya tepat waktu ya. Pastikan kalian melakukan absen jari di perangkat IoT yang tersedia. \n\n";
+        $redaksi .= "Terima kasih atas partisipasinya! 🙏";
+
+        Session::start();
+        $_SESSION['redaksi_to_copy'] = $redaksi;
+
+        setFlash('success', 'Redaksi pengumuman kegiatan berhasil dibuat! Silakan copy-paste ke grup.');
         redirect('index.php?page=event');
     }
 }

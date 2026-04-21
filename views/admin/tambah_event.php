@@ -67,9 +67,19 @@
                         <input name="waktu_mulai" class="w-full bg-surface-container-high/40 border-none rounded-xl py-3 px-4 focus:ring-2 focus:ring-primary/20 text-sm text-slate-800 font-medium" type="datetime-local" required/>
                     </div>
                     <div class="space-y-2">
-                        <label class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Waktu Berakhir</label>
-                        <input name="waktu_selesai" class="w-full bg-surface-container-high/40 border-none rounded-xl py-3 px-4 focus:ring-2 focus:ring-primary/20 text-sm text-slate-800 font-medium" type="datetime-local" required/>
-                    </div>
+                        <label class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Durasi Kegiatan</label>
+                        <select name="durasi" class="w-full bg-surface-container-high/40 border-none rounded-xl py-3 px-4 focus:ring-2 focus:ring-primary/20 text-sm text-slate-800 font-medium" required>
+                            <option value="30">30 Menit</option>
+                            <option value="60">1 Jam</option>
+                            <option value="90">1.5 Jam</option>
+                            <option value="120" selected>2 Jam</option>
+                            <option value="150">2.5 Jam</option>
+                            <option value="180">3 Jam</option>
+                            <option value="240">4 Jam</option>
+                            <option value="300">5 Jam</option>
+                            <option value="360">6 Jam</option>
+                            <option value="480">8 Jam</option>
+                        </select>
                     </div>
                 </div>
 
@@ -97,8 +107,17 @@
                             <input name="jam_mulai" class="w-full bg-surface-container-high/40 border-none rounded-xl py-3 px-4 focus:ring-2 focus:ring-primary/20 text-sm text-slate-800 font-medium routine-input" type="time"/>
                         </div>
                         <div class="space-y-2">
-                            <label class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Jam Berakhir</label>
-                            <input name="jam_selesai" class="w-full bg-surface-container-high/40 border-none rounded-xl py-3 px-4 focus:ring-2 focus:ring-primary/20 text-sm text-slate-800 font-medium routine-input" type="time"/>
+                            <label class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Durasi Pertemuan (Mingguan)</label>
+                            <select name="durasi_rutin" class="w-full bg-surface-container-high/40 border-none rounded-xl py-3 px-4 focus:ring-2 focus:ring-primary/20 text-sm text-slate-800 font-medium routine-input">
+                                <option value="30">30 Menit</option>
+                                <option value="60">1 Jam</option>
+                                <option value="90">1.5 Jam</option>
+                                <option value="120" selected>2 Jam</option>
+                                <option value="150">2.5 Jam</option>
+                                <option value="180">3 Jam</option>
+                                <option value="240">4 Jam</option>
+                                <option value="300">5 Jam</option>
+                            </select>
                         </div>
                     </div>
                 </div>

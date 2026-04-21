@@ -191,6 +191,10 @@ if ($action) {
             require_once 'core/controllers/EventController.php';
             (new EventController())->cancel();
             break;
+        case 'event_redaksi':
+            require_once 'core/controllers/EventController.php';
+            (new EventController())->generateRedaksi();
+            break;
         case 'event_import_csv':
             require_once 'core/controllers/EventController.php';
             (new EventController())->importCsv();

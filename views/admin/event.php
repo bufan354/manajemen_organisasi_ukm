@@ -236,7 +236,16 @@
                                     <span class="material-symbols-outlined text-[16px]">visibility</span> Detail
                                 </a>
                                 <?php if ($status !== 'cancelled'): ?>
-                                <button onclick="openPostponeModal(<?= $ev['id'] ?>, '<?= addslashes($ev['nama'] ?? '') ?>', '<?= date('Y-m-d\TH:i', strtotime($ev['waktu_mulai'])) ?>', '<?= date('Y-m-d\TH:i', strtotime($ev['waktu_selesai'])) ?>')" class="p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-all" title="Undur Kegiatan">
+                                <a href="index.php?action=event_redaksi&id=<?= $ev['id'] ?>" class="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all flex items-center justify-center" title="Buat Teks Pengumuman">
+                                    <span class="material-symbols-outlined text-xl">campaign</span>
+                                </a>
+                                <?php
+                                    $dm = 120;
+                                    if(!empty($ev['waktu_mulai']) && !empty($ev['waktu_selesai'])) {
+                                        $dm = round((strtotime($ev['waktu_selesai']) - strtotime($ev['waktu_mulai'])) / 60);
+                                    }
+                                ?>
+                                <button onclick="openPostponeModal(<?= $ev['id'] ?>, '<?= addslashes($ev['nama'] ?? '') ?>', '<?= date('Y-m-d\TH:i', strtotime($ev['waktu_mulai'])) ?>', <?= $dm ?>)" class="p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-all" title="Undur Kegiatan">
                                     <span class="material-symbols-outlined text-xl">event_upcoming</span>
                                 </button>
                                 <button onclick="openCancelModal(<?= $ev['id'] ?>, '<?= addslashes($ev['nama'] ?? '') ?>')" class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all" title="Batalkan Kegiatan">
@@ -339,8 +348,19 @@
                     <input type="datetime-local" name="waktu_mulai" id="postponeMulai" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary/20 outline-none transition-all">
                 </div>
                 <div class="space-y-1">
-                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Waktu Selesai Baru</label>
-                    <input type="datetime-local" name="waktu_selesai" id="postponeSelesai" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary/20 outline-none transition-all">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Durasi Kegiatan</label>
+                    <select name="durasi" id="postponeDurasi" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary/20 outline-none transition-all">
+                        <option value="30">30 Menit</option>
+                        <option value="60">1 Jam</option>
+                        <option value="90">1.5 Jam</option>
+                        <option value="120" selected>2 Jam</option>
+                        <option value="150">2.5 Jam</option>
+                        <option value="180">3 Jam</option>
+                        <option value="240">4 Jam</option>
+                        <option value="300">5 Jam</option>
+                        <option value="360">6 Jam</option>
+                        <option value="480">8 Jam</option>
+                    </select>
                 </div>
             </div>
             <div class="space-y-1">
@@ -407,11 +427,18 @@
         setTimeout(() => { document.getElementById('importModal').classList.add('hidden'); }, 300);
     }
 
-    function openPostponeModal(id, name, start, end) {
+    function openPostponeModal(id, name, start, durasi) {
         document.getElementById('postponeId').value = id;
         document.getElementById('postponeText').innerHTML = `Atur ulang jadwal untuk kegiatan <strong>${name}</strong>. Waktu baru akan diperbarui dan pengumuman akan dibuat otomatis.`;
         document.getElementById('postponeMulai').value = start;
-        document.getElementById('postponeSelesai').value = end;
+        
+        let durSelect = document.getElementById('postponeDurasi');
+        let options = Array.from(durSelect.options).map(o => o.value);
+        if(!options.includes(durasi.toString())) {
+            let newOpt = new Option(durasi + " Menit", durasi);
+            durSelect.add(newOpt);
+        }
+        durSelect.value = durasi;
         
         const modal = document.getElementById('postponeModal');
         const content = document.getElementById('postponeModalContent');
