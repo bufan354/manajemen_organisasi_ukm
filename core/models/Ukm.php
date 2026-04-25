@@ -89,11 +89,39 @@ class Ukm
         ]);
     }
 
-    /** Hapus UKM (Soft Delete) */
+    /** Hapus UKM (Hard Delete - Hapus Permanen beserta file) */
     public function delete(int $id): bool
     {
-        // Fitur Soft Delete tidak menghapus data foto dan record terkait dari disk/basis data.
-        $stmt = $this->db->prepare("UPDATE ukm SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?");
+        // 1. Ambil data UKM untuk hapus logo & header
+        $ukm = $this->getById($id);
+        if ($ukm) {
+            if (!empty($ukm['logo_path'])) FileUpload::delete($ukm['logo_path']);
+            if (!empty($ukm['header_path'])) FileUpload::delete($ukm['header_path']);
+        }
+
+        // 2. Hapus foto-foto anggota UKM
+        $stmtAnggota = $this->db->prepare("SELECT foto_path FROM anggota WHERE ukm_id = ?");
+        $stmtAnggota->execute([$id]);
+        foreach ($stmtAnggota->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            if (!empty($row['foto_path'])) FileUpload::delete($row['foto_path']);
+        }
+
+        // 3. Hapus gambar-gambar berita UKM
+        $stmtBerita = $this->db->prepare("SELECT gambar_path FROM berita WHERE ukm_id = ?");
+        $stmtBerita->execute([$id]);
+        foreach ($stmtBerita->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            if (!empty($row['gambar_path'])) FileUpload::delete($row['gambar_path']);
+        }
+
+        // 4. Hapus foto-foto admin UKM
+        $stmtAdmin = $this->db->prepare("SELECT foto_path FROM admins WHERE ukm_id = ?");
+        $stmtAdmin->execute([$id]);
+        foreach ($stmtAdmin->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            if (!empty($row['foto_path'])) FileUpload::delete($row['foto_path']);
+        }
+
+        // 5. Akhirnya, hapus record UKM (Trigger CASCADE di DB akan hapus sisa data teks)
+        $stmt = $this->db->prepare("DELETE FROM ukm WHERE id = ?");
         return $stmt->execute([$id]);
     }
 
