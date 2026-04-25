@@ -7,6 +7,7 @@
 Sistem Absensi berbasis Internet of Things (IoT) yang mengintegrasikan perangkat keras ESP32, sensor sidik jari AS608, dan dashboard web modern untuk manajemen kehadiran Unit Kegiatan Mahasiswa (UKM) atau organisasi secara efisien dan transparan.
 
 ![Dashboard Mockup](assets/common/img/dashboard_mockup.png)
+![Home Page](assets/common/img/home.png)
 
 ## Deskripsi Proyek
 
@@ -40,7 +41,7 @@ Proyek ini dirancang untuk menggantikan sistem absensi manual dengan solusi digi
 ### 1. Konfigurasi Web Server
 1. Clone repositori ini ke direktori server Anda:
    ```bash
-   git clone https://github.com/username/absensi-iot.git
+   git clone https://github.com/bufan354/absensi-iot.git
    ```
 2. Buat database baru di MySQL (contoh: `absensi_iot`).
 3. Import skema database yang tersedia di `database/schema.sql`.
