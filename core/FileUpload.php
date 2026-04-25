@@ -43,7 +43,7 @@ class FileUpload
         // Pastikan direktori ada
         $targetDir = self::$baseDir . '/' . $category;
         if (!is_dir($targetDir)) {
-            mkdir($targetDir, 0755, true);
+            mkdir($targetDir, 0775, true);
         }
 
         $targetPath = $targetDir . '/' . $filename;

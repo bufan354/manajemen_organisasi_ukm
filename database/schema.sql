@@ -40,7 +40,9 @@ CREATE TABLE IF NOT EXISTS periode (
     id            INT AUTO_INCREMENT PRIMARY KEY,
     ukm_id        INT          NOT NULL,
     tahun_mulai   YEAR         NOT NULL,
+    bulan_mulai   INT          DEFAULT NULL,
     tahun_selesai YEAR         NOT NULL,
+    bulan_selesai INT          DEFAULT NULL,
     is_active     TINYINT(1)   DEFAULT 0,
     nama          VARCHAR(150) NOT NULL,
     deskripsi     TEXT         DEFAULT NULL,
@@ -163,7 +165,7 @@ CREATE TABLE IF NOT EXISTS events (
 CREATE TABLE IF NOT EXISTS pendaftaran (
     id                 INT AUTO_INCREMENT PRIMARY KEY,
     ukm_id             INT          NOT NULL,
-    periode_id         INT          NOT NULL,
+    periode_id         INT          DEFAULT NULL,
     nama               VARCHAR(150) NOT NULL,
     email              VARCHAR(150) NOT NULL,
     no_wa              VARCHAR(20)  NOT NULL,
@@ -202,6 +204,7 @@ CREATE TABLE IF NOT EXISTS absensi (
     metode      ENUM('fingerprint','rfid','manual') DEFAULT 'manual',
     FOREIGN KEY (event_id)   REFERENCES events(id)  ON DELETE CASCADE,
     FOREIGN KEY (anggota_id) REFERENCES anggota(id)  ON DELETE CASCADE,
+    UNIQUE KEY unique_absensi (event_id, anggota_id),
     INDEX idx_event_anggota (event_id, anggota_id)
 ) ENGINE=InnoDB;
 

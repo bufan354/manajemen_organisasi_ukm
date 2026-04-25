@@ -8,8 +8,8 @@ storage/*
 !storage/.gitkeep
 
 # Uploads (Exclude actual files, keep directory structure)
-uploads/*
-!uploads/.gitkeep
+uploads/**/*
+!uploads/**/.gitkeep
 
 # Hardware Configuration (Secrets)
 hardware/**/config.h

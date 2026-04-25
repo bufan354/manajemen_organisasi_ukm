@@ -51,9 +51,18 @@ class AnggotaController
         if (Session::get('admin_role') === 'superadmin') {
             require_once 'core/models/Periode.php';
             $activePeriode = (new Periode())->getActive($ukmId);
-            $data['periode_id'] = $activePeriode ? $activePeriode['id'] : 0;
+            if (!$activePeriode) {
+                setFlash('error', 'UKM ini belum memiliki periode aktif. Silakan aktifkan periode terlebih dahulu.');
+                redirect('index.php?page=tambah_anggota&ukm_id=' . $ukmId);
+            }
+            $data['periode_id'] = $activePeriode['id'];
         } else {
-            $data['periode_id'] = (int)Session::get('periode_id');
+            $periodeId = (int)Session::get('periode_id');
+            if (!$periodeId) {
+                setFlash('error', 'Tidak ada periode aktif. Silakan hubungi superadmin untuk mengaktifkan periode.');
+                redirect('index.php?page=anggota');
+            }
+            $data['periode_id'] = $periodeId;
         }
 
         if (FileUpload::hasFile('foto')) {

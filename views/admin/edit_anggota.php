@@ -26,19 +26,21 @@
                     <h3 class="text-lg font-bold border-b border-outline-variant/20 pb-2">Informasi Pribadi</h3>
                     
                     <div class="flex items-center gap-6 mb-2">
-                        <div class="w-24 h-24 rounded-full bg-surface-container flex items-center justify-center border-2 border-dashed border-outline/50 overflow-hidden relative group p-1">
+                        <div class="w-24 h-24 rounded-full bg-surface-container flex items-center justify-center border-2 border-dashed border-outline/50 overflow-hidden relative group p-1 cursor-pointer" onclick="document.getElementById('foto-input').click()">
                             <?php if (!empty($a['foto_path'])): ?>
-                                <img src="<?= htmlspecialchars($a['foto_path']) ?>" class="w-full h-full object-cover rounded-full" alt="Avatar">
+                                <img id="foto-preview-img" src="<?= htmlspecialchars($a['foto_path']) ?>" class="w-full h-full object-cover rounded-full" alt="Avatar">
+                                <span id="foto-placeholder-icon" class="material-symbols-outlined text-outline text-3xl hidden">person</span>
                             <?php else: ?>
-                                <span class="material-symbols-outlined text-outline text-3xl">person</span>
+                                <img id="foto-preview-img" src="" class="w-full h-full object-cover rounded-full hidden" alt="Avatar">
+                                <span id="foto-placeholder-icon" class="material-symbols-outlined text-outline text-3xl">person</span>
                             <?php endif; ?>
-                            <div class="absolute inset-0 bg-black/40 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer" onclick="document.getElementById('foto-input').click()">
+                            <div class="absolute inset-0 bg-black/40 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                                 <span class="material-symbols-outlined text-white">edit</span>
                             </div>
                         </div>
                         <div>
                             <p class="font-bold text-sm text-on-surface mb-1">Foto Profil</p>
-                            <p class="text-xs text-on-surface-variant mb-3">Pilih file baru bila ingin menimpa</p>
+                            <p id="foto-filename" class="text-xs text-on-surface-variant mb-3">Pilih file baru bila ingin menimpa</p>
                             <input type="file" name="foto" id="foto-input" accept="image/*" class="hidden">
                             <button type="button" onclick="document.getElementById('foto-input').click()" class="px-4 py-2 bg-surface text-primary text-xs font-bold rounded-lg border border-primary/20 hover:bg-primary-fixed transition-colors">Pilih File Pengganti</button>
                         </div>
@@ -212,6 +214,29 @@
         const opt = this.options[this.selectedIndex];
         const label = opt.getAttribute('data-label');
         if (label) inp.value = label;
+    });
+})();
+
+// Foto preview
+(function() {
+    const input = document.getElementById('foto-input');
+    const preview = document.getElementById('foto-preview-img');
+    const placeholder = document.getElementById('foto-placeholder-icon');
+    const filenameEl = document.getElementById('foto-filename');
+    if (!input || !preview) return;
+
+    input.addEventListener('change', function() {
+        const file = this.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.classList.remove('hidden');
+                if (placeholder) placeholder.classList.add('hidden');
+            };
+            reader.readAsDataURL(file);
+            if (filenameEl) filenameEl.textContent = file.name;
+        }
     });
 })();
 </script>
