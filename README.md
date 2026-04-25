@@ -8,7 +8,6 @@ Sistem Absensi berbasis Internet of Things (IoT) yang mengintegrasikan perangkat
 
 ![Dashboard Mockup](assets/common/img/home.png)
 
-![Home Page](assets/common/img/home.png)
 
 ## Deskripsi Proyek
 
