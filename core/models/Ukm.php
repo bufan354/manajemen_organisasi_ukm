@@ -50,8 +50,8 @@ class Ukm
     public function create(array $data): int
     {
         $stmt = $this->db->prepare(
-            "INSERT INTO ukm (nama, singkatan, kategori, slogan, deskripsi, logo_path, header_path, lokasi, tanggal_berdiri) 
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+            "INSERT INTO ukm (nama, singkatan, kategori, slogan, deskripsi, logo_path, header_path, lokasi, koordinat, tanggal_berdiri) 
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
         );
         $stmt->execute([
             $data['nama'],
@@ -62,6 +62,7 @@ class Ukm
             $data['logo_path']       ?? null,
             $data['header_path']     ?? null,
             $data['lokasi']          ?? null,
+            $data['koordinat']       ?? null,
             $data['tanggal_berdiri'] ?? null,
         ]);
         return (int)$this->db->lastInsertId();
@@ -72,7 +73,7 @@ class Ukm
     {
         $stmt = $this->db->prepare(
             "UPDATE ukm SET nama = ?, singkatan = ?, kategori = ?, slogan = ?, deskripsi = ?,
-                            logo_path = ?, header_path = ?, lokasi = ?, tanggal_berdiri = ?
+                            logo_path = ?, header_path = ?, lokasi = ?, koordinat = ?, tanggal_berdiri = ?
              WHERE id = ?"
         );
         return $stmt->execute([
@@ -84,6 +85,7 @@ class Ukm
             $data['logo_path']       ?? null,
             $data['header_path']     ?? null,
             $data['lokasi']          ?? null,
+            $data['koordinat']       ?? null,
             $data['tanggal_berdiri'] ?? null,
             $id,
         ]);

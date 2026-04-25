@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS ukm (
     logo_path        VARCHAR(255) DEFAULT NULL,   -- Path logo (crop center lingkaran)
     header_path      VARCHAR(255) DEFAULT NULL,   -- Path gambar header/banner
     lokasi           VARCHAR(200) DEFAULT NULL,   -- Lokasi markas UKM
+    koordinat        VARCHAR(100) DEFAULT NULL,   -- Koordinat Google Maps (Lat, Lng)
     tanggal_berdiri  DATE         DEFAULT NULL,
     status           ENUM('aktif', 'nonaktif') DEFAULT 'aktif',
     created_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

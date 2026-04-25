@@ -224,11 +224,19 @@ $fokusOptions = ['Seni', 'Olahraga', 'Teknologi', 'Sosial', 'Akademik', 'Keagama
                     </h4>
                     <div class="space-y-6">
                         <div>
-                            <label class="block text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-2">Lokasi Markas</label>
+                            <label class="block text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-2">Lokasi</label>
                             <div class="relative">
                                 <input name="lokasi" class="w-full bg-surface-container-low border-none rounded-xl pl-11 pr-4 py-3 focus:ring-2 focus:ring-primary/20 text-on-surface font-medium" type="text" placeholder="Cth: Lab A, Gedung C" value="<?= htmlspecialchars($u['lokasi'] ?? '') ?>"/>
                                 <span class="material-symbols-outlined absolute left-4 top-3 text-primary">map</span>
                             </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-2">Koordinat Google Maps</label>
+                            <div class="relative">
+                                <input name="koordinat" class="w-full bg-surface-container-low border-none rounded-xl pl-11 pr-4 py-3 focus:ring-2 focus:ring-primary/20 text-on-surface font-medium" type="text" placeholder="Cth: -6.1234, 106.1234" value="<?= htmlspecialchars($u['koordinat'] ?? '') ?>"/>
+                                <span class="material-symbols-outlined absolute left-4 top-3 text-primary">location_on</span>
+                            </div>
+                            <p class="text-[10px] text-on-surface-variant mt-1.5 flex gap-1"><span class="material-symbols-outlined text-[12px]">info</span><span>Dapatkan dari Google Maps (Klik kanan > Salin koordinat)</span></p>
                         </div>
                         <div>
                             <label class="block text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-2">Tanggal Berdiri</label>

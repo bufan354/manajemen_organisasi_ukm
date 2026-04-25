@@ -23,7 +23,7 @@
                     </div>
                     <div>
                         <h3 class="text-lg font-bold text-slate-900 mb-1">Basecamp Resmi (Sekretariat)</h3>
-                        <p class="text-slate-600 leading-relaxed text-sm">Gedung Pusat Kegiatan Mahasiswa (PKM) Lantai 2, Ruang 204. Kampus Utama Universitas Teknologi Nusantara.<br>Jl. Pendidikan No. 71, Kota Impian, 12345.</p>
+                        <p class="text-slate-600 leading-relaxed text-sm"><?= nl2br(htmlspecialchars($ukm['lokasi'] ?? 'Alamat belum diisi.')) ?></p>
                     </div>
                 </div>
 
@@ -100,17 +100,40 @@
 
             </div>
 
-            <!-- Right Panel: Map Embedded -->
             <div class="lg:col-span-7 bg-white p-2 rounded-[2rem] shadow-xl shadow-slate-200/50 border border-slate-100 flex flex-col h-[700px]">
                 <div class="w-full h-full rounded-[1.5rem] overflow-hidden bg-slate-100 relative">
-                    <iframe 
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d126934.33157585094!2d106.7454245!3d-6.1738779!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69f3e945e34b9d%3A0x100c5e82dd4b820!2sJakarta%2C%20Indonesia!5e0!3m2!1sen!2sus!4v1713000000000!5m2!1sen!2sus" 
-                        width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
-                    </iframe>
+                    <?php if (!empty($ukm['koordinat'])): ?>
+                        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+                        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+                        <div id="map" class="w-full h-full"></div>
+                        <script>
+                            (function() {
+                                const coords = "<?= $ukm['koordinat'] ?>".split(',').map(c => parseFloat(c.trim()));
+                                if (coords.length === 2 && !isNaN(coords[0]) && !isNaN(coords[1])) {
+                                    const map = L.map('map').setView(coords, 16);
+                                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                                        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                                    }).addTo(map);
+                                    L.marker(coords).addTo(map)
+                                        .bindPopup('<b><?= htmlspecialchars($ukm['nama']) ?></b><br><?= htmlspecialchars($ukm['lokasi'] ?? '') ?>')
+                                        .openPopup();
+                                } else {
+                                    document.getElementById('map').innerHTML = '<div class="flex items-center justify-center h-full text-slate-400 flex-col gap-2"><span class="material-symbols-outlined text-4xl">map</span><p>Format koordinat tidak valid.</p></div>';
+                                }
+                            })();
+                        </script>
+                    <?php else: ?>
+                        <div class="flex items-center justify-center h-full text-slate-400 flex-col gap-2">
+                            <span class="material-symbols-outlined text-5xl">map</span>
+                            <p class="font-bold">Peta belum tersedia</p>
+                            <p class="text-sm">Admin belum mengatur koordinat lokasi.</p>
+                        </div>
+                    <?php endif; ?>
+
                     <!-- Hint badge on top of map -->
-                    <div class="absolute top-6 left-6 bg-white/90 backdrop-blur px-5 py-3 rounded-2xl shadow-lg border border-white flex flex-col pointer-events-none">
-                        <span class="font-black text-slate-800 text-sm">Gedung PKM UTN</span>
-                        <span class="text-xs text-slate-500 font-medium">Buka Sen-Jum, 09:00 - 16:00</span>
+                    <div class="absolute top-6 left-6 bg-white/90 backdrop-blur px-5 py-3 rounded-2xl shadow-lg border border-white flex flex-col pointer-events-none z-[1000]">
+                        <span class="font-black text-slate-800 text-sm"><?= htmlspecialchars($ukm['nama']) ?></span>
+                        <span class="text-xs text-slate-500 font-medium"><?= htmlspecialchars($ukm['singkatan'] ?? '') ?></span>
                     </div>
                 </div>
             </div>
