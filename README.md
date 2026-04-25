@@ -41,7 +41,8 @@ Proyek ini dirancang untuk menggantikan sistem absensi manual dengan solusi digi
 ### 1. Konfigurasi Web Server
 1. Clone repositori ini ke direktori server Anda:
    ```bash
-   git clone https://github.com/bufan354/absensi-iot.git
+   git clone https://github.com/bufan354/manajemen_organisasi_ukm.git
+   cd manajemen_organisasi_ukm
    ```
 2. Buat database baru di MySQL (contoh: `absensi_iot`).
 3. Import skema database yang tersedia di `database/schema.sql`.
