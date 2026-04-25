@@ -6,7 +6,7 @@
 
 Sistem Absensi berbasis Internet of Things (IoT) yang mengintegrasikan perangkat keras ESP32, sensor sidik jari AS608, dan dashboard web modern untuk manajemen kehadiran Unit Kegiatan Mahasiswa (UKM) atau organisasi secara efisien dan transparan.
 
-![Dashboard Mockup](assets/common/img/dashboard_mockup.png)
+![Dashboard Mockup](assets/common/img/home.png)
 
 ![Home Page](assets/common/img/home.png)
 
