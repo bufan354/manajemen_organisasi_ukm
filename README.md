@@ -1,75 +1,74 @@
-# Sistem Absensi IoT: Fingerprint & Real-time Dashboard
+# Sistem Manajemen Organisasi Terintegrasi (SMO)
+### Manajemen UKM & Organisasi berbasis IoT Modern
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![PHP Version](https://img.shields.io/badge/PHP-8.x-blue.svg)](https://www.php.net/)
-[![Platform](https://img.shields.io/badge/Platform-ESP32-green.svg)](https://www.espressif.com/en/products/socs/esp32)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![PHP Version](https://img.shields.io/badge/PHP-8.x-777bb4.svg)](https://www.php.net/)
+[![Tailwind CSS](https://img.shields.io/badge/Styling-Tailwind_CSS-38b2ac.svg)](https://tailwindcss.com/)
+[![IoT Powered](https://img.shields.io/badge/IoT-ESP32_Ready-orange.svg)](https://www.espressif.com/)
 
-Sistem Absensi berbasis Internet of Things (IoT) yang mengintegrasikan perangkat keras ESP32, sensor sidik jari AS608, dan dashboard web modern untuk manajemen kehadiran Unit Kegiatan Mahasiswa (UKM) atau organisasi secara efisien dan transparan.
+Sistem Manajemen Organisasi Terintegrasi adalah platform *all-in-one* yang dirancang untuk mendigitalisasi seluruh aspek operasional organisasi atau Unit Kegiatan Mahasiswa (UKM). Dari manajemen pendaftaran anggota baru hingga monitoring kehadiran biometrik secara real-time, sistem ini memberikan solusi menyeluruh untuk efisiensi dan transparansi organisasi.
 
-![Dashboard Mockup](assets/common/img/home.png)
+![Hero Image](assets/common/img/home.png)
 
+## 🚀 Modul Unggulan
 
-## Deskripsi Proyek
+Sistem ini dikembangkan dengan arsitektur modular yang mencakup berbagai aspek krusial manajemen organisasi:
 
-Proyek ini dirancang untuk menggantikan sistem absensi manual dengan solusi digital yang aman dan dapat dipantau secara langsung. Dengan sinkronisasi antara perangkat keras dan aplikasi web, admin dapat mengelola data anggota, memantau kehadiran secara real-time, dan menghasilkan laporan otomatis.
+### 1. 👥 Manajemen Keanggotaan & Hierarki
+- **Struktur Organisasi**: Manajemen kepengurusan per periode dengan tingkatan jabatan yang dinamis.
+- **Buku Induk Anggota**: Database pusat untuk data akademik dan personal anggota.
+- **Riwayat Jabatan**: Pelacakan peran anggota dari periode ke periode.
 
-## Fitur Unggulan
+### 2. 📝 Open Recruitment (Oprec) Digital
+- **Formulir Kustom**: Admin dapat membuat kuisioner tambahan sesuai kebutuhan seleksi masing-masing UKM.
+- **Snapshot Integritas**: Menyimpan teks pertanyaan asli saat pendaftaran untuk menjaga akurasi data jangka panjang.
+- **Dashboard Verifikasi**: Alur persetujuan atau penolakan pendaftar dengan sistem notifikasi dan template alasan penolakan.
 
-*   **Monitoring Real-time**: Pembaruan dashboard secara otomatis setiap kali ada aktivitas absensi dari perangkat IoT.
-*   **Arsitektur Multi-UKM**: Memungkinkan manajemen banyak organisasi dalam satu platform terpusat melalui hak akses Superadmin.
-*   **Keamanan Komunikasi**: Integrasi API Key dan header khusus untuk memastikan komunikasi antara ESP32 dan server tetap aman.
-*   **Otentikasi Berlapis**: Dilengkapi dengan sistem login yang aman, perlindungan CSRF, dan dukungan Two-Factor Authentication (2FA).
-*   **Ekspor Laporan**: Fasilitas untuk mengunduh laporan kehadiran dalam format Excel yang terstruktur.
-*   **Sinkronisasi Biometrik**: Manajemen data sidik jari (Enroll, Delete, Verify) langsung melalui sinkronisasi database dan perangkat.
+### 3. 📰 Publikasi & Berita
+- **CMS Berita**: Publikasi kegiatan, artikel, dan pengumuman organisasi secara terstruktur.
+- **Status Penerbitan**: Manajemen draft dan publikasi untuk alur redaksi yang lebih rapi.
 
-## Arsitektur Teknologi
+### 4. ⚡ IoT Attendance System (Feature Unggulan)
+- **Monitoring Real-time**: Dashboard kehadiran yang diperbarui secara instan saat sidik jari dipindai.
+- **Biometrik Terpusat**: Manajemen data sidik jari (Enroll & Delete) langsung dari dashboard admin.
+- **Sinkronisasi ESP32**: Komunikasi aman antara perangkat keras dan server menggunakan API Key dan Header khusus.
 
-### Stack Web
-*   **Bahasa Pemrograman**: PHP 8.x (Vanilla dengan pola desain MVC)
-*   **Database**: MySQL
-*   **Frontend**: Tailwind CSS & Chart.js (Visualisasi Data)
-*   **Keamanan**: API Key Authentication, CSRF Protection, 2FA
+### 5. 🔐 Keamanan & Administrasi
+- **Two-Factor Authentication (2FA)**: Perlindungan tambahan untuk akun Admin dan Superadmin menggunakan TOTP.
+- **Audit Log**: Pencatatan aktivitas sensitif untuk memantau penggunaan sistem.
+- **Soft Delete**: Sistem arsip data pendaftaran agar histori tidak hilang meski data telah dihapus dari daftar aktif.
 
-### Perangkat Keras (IoT)
-*   **Mikrokontroler**: ESP32
-*   **Sensor**: AS608 Optical Fingerprint Sensor
-*   **Konektivitas**: WiFiManager untuk konfigurasi jaringan dinamis
-*   **Firmware**: Arduino C++
+## 🛠 Arsitektur Teknologi
 
-## Panduan Instalasi
+- **Backend**: PHP 8.x (Custom MVC Architecture)
+- **Frontend**: Tailwind CSS, Vanilla JS, Chart.js
+- **Database**: MySQL (optimized for large scale relations)
+- **Hardware Interface**: ESP32 with AS608 Optical Fingerprint Sensor
+- **Security**: CSRF Protection, Password Hashing, API Auth, Rate Limiting
 
-### 1. Konfigurasi Web Server
-1. Clone repositori ini ke direktori server Anda:
+## 📦 Instalasi
+
+### Prasyarat
+- PHP 8.1 atau lebih tinggi
+- MySQL / MariaDB
+- Web Server (Apache / Nginx)
+
+### Langkah-langkah
+1. Clone repositori:
    ```bash
    git clone https://github.com/bufan354/manajemen_organisasi_ukm.git
-   cd manajemen_organisasi_ukm
    ```
-2. Buat database baru di MySQL (contoh: `absensi_iot`).
-3. Import skema database yang tersedia di `database/schema.sql`.
-4. Ubah nama file `.env.example` menjadi `.env` dan sesuaikan konfigurasi database serta `API_KEY`.
-5. Pastikan direktori `uploads/` memiliki izin akses tulis (write permission).
+2. Konfigurasi Database:
+   - Buat database baru di MySQL.
+   - Import file `database/schema.sql`.
+3. Atur Lingkungan:
+   - Salin file `.env.example` ke `.env`.
+   - Sesuaikan kredensial database dan API Key.
+4. Selesai! Akses aplikasi melalui browser Anda.
 
-### 2. Konfigurasi Hardware (ESP32)
-1. Akses direktori `hardware/ESP32_Fingerprint/` menggunakan Arduino IDE.
-2. Salin `config.h.example` menjadi `config.h`.
-3. Sesuaikan `SERVER_URLS` dan `API_KEY` (harus identik dengan nilai di file `.env` server).
-4. Instal library pendukung berikut pada Arduino IDE:
-   *   Adafruit Fingerprint Sensor Library
-   *   WiFiManager
-   *   LiquidCrystal_I2C
-5. Lakukan proses upload kode ke modul ESP32.
+## 🤝 Kontribusi
 
-## Standar Keamanan
-
-Sistem ini menerapkan standar keamanan tinggi untuk melindungi integritas data:
-*   Pemisahan data sensitif melalui variabel lingkungan (.env).
-*   Validasi setiap request dari perangkat keras menggunakan header `X-API-KEY`.
-*   Implementasi token CSRF pada setiap formulir administrasi.
-*   Enkripsi data pada level aplikasi untuk informasi kredensial.
-
-## Lisensi
-
-Proyek ini dilisensikan di bawah **MIT License**. Silakan lihat file `LICENSE` untuk informasi lebih lanjut.
+Kami menerima kontribusi dalam bentuk pelaporan bug, saran fitur, atau pull request. Pastikan untuk selalu melakukan `git pull` sebelum memulai perubahan.
 
 ---
-*Dikembangkan untuk solusi manajemen kehadiran organisasi dan keperluan akademik.*
+Dikembangkan dengan ❤️ oleh **Tim Pengembang Organisasi Digital**.
