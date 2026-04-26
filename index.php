@@ -139,6 +139,10 @@ if ($action) {
             require_once 'core/controllers/AdminController.php';
             (new AdminController())->delete();
             break;
+        case 'admin_reset_access':
+            require_once 'core/controllers/AdminController.php';
+            (new AdminController())->resetAccess();
+            break;
         case 'update_profile':
             require_once 'core/controllers/AdminController.php';
             (new AdminController())->updateProfile();
@@ -1076,11 +1080,21 @@ switch ($page) {
     case 'verifikasi_pendaftar':
         Session::requireLogin();
         require_once 'core/models/Pendaftaran.php';
+        require_once 'core/models/Pengaturan.php';
         $ukmId = Session::get('admin_role') === 'superadmin' ? null : (int)Session::get('ukm_id');
         $periodeId = Session::get('admin_role') === 'superadmin' ? null : (int)Session::get('periode_id');
+        
+        $pendaftaranList = (new Pendaftaran())->getAll($ukmId, $periodeId);
+        
+        $pendaftaranModel = new Pendaftaran();
+        foreach ($pendaftaranList as &$p) {
+            $p['answers'] = $pendaftaranModel->getAnswers($p['id']);
+        }
+        unset($p);
+
         View::renderAdmin('admin/verifikasi_pendaftar', [
             'title'           => 'Verifikasi Pendaftar',
-            'pendaftaranList' => (new Pendaftaran())->getAll($ukmId, $periodeId),
+            'pendaftaranList' => $pendaftaranList
         ]);
         break;
 

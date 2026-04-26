@@ -87,9 +87,10 @@
                     </td>
                     <td class="px-6 py-4">
                         <div class="flex items-center justify-center gap-1">
-                            <a href="index.php?page=edit_admin&id=<?= $admin['id'] ?>" class="p-2 text-slate-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-all flex items-center justify-center"><span class="material-symbols-outlined text-[20px]">edit</span></a>
+                            <a href="index.php?page=edit_admin&id=<?= $admin['id'] ?>" class="p-2 text-slate-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-all flex items-center justify-center" title="Edit Data"><span class="material-symbols-outlined text-[20px]">edit</span></a>
                             <?php if ($admin['id'] != Session::get('admin_id')): ?>
-                            <button onclick="openDeleteModal('<?= addslashes($admin['nama']) ?>', <?= $admin['id'] ?>)" class="p-2 text-slate-400 hover:text-error hover:bg-error/5 rounded-lg transition-all"><span class="material-symbols-outlined text-[20px]">delete</span></button>
+                            <button onclick="openResetModal('<?= addslashes($admin['nama']) ?>', <?= $admin['id'] ?>)" class="p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-all" title="Reset Akses"><span class="material-symbols-outlined text-[20px]">key</span></button>
+                            <button onclick="openDeleteModal('<?= addslashes($admin['nama']) ?>', <?= $admin['id'] ?>)" class="p-2 text-slate-400 hover:text-error hover:bg-error/5 rounded-lg transition-all" title="Hapus Admin"><span class="material-symbols-outlined text-[20px]">delete</span></button>
                             <?php endif; ?>
                         </div>
                     </td>
@@ -183,4 +184,63 @@
             document.getElementById('deleteModal').classList.add('hidden');
         }, 300);
     }
+
+    function openResetModal(name, id) {
+        document.getElementById('resetTargetName').innerText = name;
+        document.getElementById('resetTargetId').value = id;
+        const modal = document.getElementById('resetModal');
+        const content = document.getElementById('resetModalContent');
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            content.classList.remove('scale-95', 'opacity-0');
+        }, 10);
+    }
+
+    function closeResetModal() {
+        const content = document.getElementById('resetModalContent');
+        content.classList.add('scale-95', 'opacity-0');
+        setTimeout(() => {
+            document.getElementById('resetModal').classList.add('hidden');
+        }, 300);
+    }
 </script>
+
+<!-- Modal: Reset Access Confirmation -->
+<div id="resetModal" class="hidden fixed inset-0 z-[110] flex items-center justify-center">
+    <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onclick="closeResetModal()"></div>
+    <div class="relative bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl overflow-hidden transform scale-95 opacity-0 transition-all duration-300" id="resetModalContent">
+        <div class="w-16 h-16 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center mb-6 mx-auto">
+            <span class="material-symbols-outlined text-[32px]">lock_reset</span>
+        </div>
+        <h3 class="text-2xl font-black text-slate-900 text-center mb-2">Reset Akses Admin</h3>
+        <p class="text-slate-500 text-center text-sm leading-relaxed mb-6">
+            Anda akan mengatur ulang kredensial untuk <strong id="resetTargetName" class="text-slate-800"></strong>. Tindakan ini akan dicatat dalam log keamanan.
+        </p>
+        
+        <form action="index.php?action=admin_reset_access" method="POST" class="space-y-4">
+            <?= csrf_field() ?>
+            <input type="hidden" name="target_id" id="resetTargetId">
+            
+            <div class="space-y-2">
+                <label class="text-[11px] font-bold uppercase tracking-widest text-slate-500">Password Baru Admin</label>
+                <input type="password" name="new_password" placeholder="Kosongkan jika hanya reset 2FA" class="w-full bg-slate-50 border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/20 text-sm">
+            </div>
+
+            <div class="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
+                <input type="checkbox" name="reset_2fa" value="1" id="reset_2fa_chk" class="w-4 h-4 text-primary rounded border-slate-300">
+                <label for="reset_2fa_chk" class="text-sm font-medium text-slate-700 cursor-pointer">Nonaktifkan 2FA (TOTP)</label>
+            </div>
+
+            <div class="pt-4 border-t border-slate-100">
+                <label class="text-[11px] font-bold uppercase tracking-widest text-primary mb-2 block">Konfirmasi Password Anda (Superadmin)</label>
+                <input type="password" name="super_password" required placeholder="Masukkan password Anda untuk konfirmasi" class="w-full bg-primary/5 border-primary/20 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/20 text-sm font-bold">
+                <p class="text-[10px] text-slate-400 mt-2 italic">* Wajib diisi untuk memvalidasi identitas Superadmin.</p>
+            </div>
+
+            <div class="flex gap-4 pt-4">
+                <button type="button" onclick="closeResetModal()" class="flex-1 py-3 px-4 bg-slate-100 text-slate-600 font-bold text-sm rounded-xl hover:bg-slate-200 transition-colors">Batal</button>
+                <button type="submit" class="flex-1 py-3 px-4 bg-amber-600 text-white font-bold text-sm rounded-xl shadow-lg shadow-amber-200 hover:bg-amber-700 transition-colors">Proses Reset</button>
+            </div>
+        </form>
+    </div>
+</div>

@@ -19,7 +19,8 @@ class Pendaftaran
     {
         $query = "SELECT p.*, u.singkatan AS ukm_nama 
                  FROM pendaftaran p
-                 LEFT JOIN ukm u ON p.ukm_id = u.id";
+                 LEFT JOIN ukm u ON p.ukm_id = u.id
+                 WHERE p.deleted_at IS NULL";
         $params = [];
         $conditions = [];
 
@@ -33,7 +34,7 @@ class Pendaftaran
         }
 
         if (count($conditions) > 0) {
-            $query .= " WHERE " . implode(" AND ", $conditions);
+            $query .= " AND " . implode(" AND ", $conditions);
         }
         $query .= " ORDER BY p.created_at DESC";
 
@@ -102,17 +103,32 @@ class Pendaftaran
         return $stmt->execute([$status, $alasanTolak, $id]);
     }
 
-    /** Hapus pendaftaran */
+    /** Hapus pendaftaran (Soft Delete) */
     public function delete(int $id): bool
     {
-        $stmt = $this->db->prepare("DELETE FROM pendaftaran WHERE id = ?");
+        $stmt = $this->db->prepare("UPDATE pendaftaran SET deleted_at = NOW() WHERE id = ?");
         return $stmt->execute([$id]);
     }
 
-    /** Hitung total pendaftaran */
+    /** Simpan jawaban kuisioner secara individual ke tabel jawaban */
+    public function createAnswer(int $pendaftaranId, string $pertanyaan, string $jawaban): bool
+    {
+        $stmt = $this->db->prepare("INSERT INTO pendaftaran_jawaban (pendaftaran_id, pertanyaan_teks, jawaban_teks) VALUES (?, ?, ?)");
+        return $stmt->execute([$pendaftaranId, $pertanyaan, $jawaban]);
+    }
+
+    /** Ambil semua jawaban kuisioner untuk pendaftaran tertentu */
+    public function getAnswers(int $pendaftaranId): array
+    {
+        $stmt = $this->db->prepare("SELECT * FROM pendaftaran_jawaban WHERE pendaftaran_id = ?");
+        $stmt->execute([$pendaftaranId]);
+        return $stmt->fetchAll();
+    }
+
+    /** Hitung total pendaftaran (excluding deleted) */
     public function count(?int $ukmId = null, ?string $status = null): int
     {
-        $sql = "SELECT COUNT(*) FROM pendaftaran WHERE 1=1";
+        $sql = "SELECT COUNT(*) FROM pendaftaran WHERE deleted_at IS NULL";
         $params = [];
 
         if ($ukmId) {

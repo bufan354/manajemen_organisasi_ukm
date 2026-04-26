@@ -197,4 +197,77 @@ class AdminController
         setFlash('success', 'Password Anda berhasil diubah. Silakan gunakan password baru pada login berikutnya.');
         redirect('index.php?page=pengaturan');
     }
+
+    /** Reset Akses Admin Lain (oleh Superadmin) dengan Verifikasi Password */
+    public function resetAccess(): void
+    {
+        Session::requireSuperAdmin();
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            redirect('index.php?page=kelola_admin');
+        }
+
+        $targetId = (int)($_POST['target_id'] ?? 0);
+        $currentAdminId = (int)Session::get('admin_id');
+        $superPassword = $_POST['super_password'] ?? '';
+        $newPassword = $_POST['new_password'] ?? '';
+        $reset2fa = isset($_POST['reset_2fa']) && $_POST['reset_2fa'] === '1';
+
+        // 1. Validasi: Tidak boleh reset diri sendiri di sini
+        if ($targetId === $currentAdminId) {
+            setFlash('error', 'Gunakan menu Pengaturan untuk mengubah keamanan akun Anda sendiri.');
+            redirect('index.php?page=kelola_admin');
+        }
+
+        // 2. Ambil data Superadmin yang sedang beraksi
+        $superAdmin = $this->model->getById($currentAdminId);
+        if (!$superAdmin || !password_verify($superPassword, $superAdmin['password'])) {
+            logSecurityActivity('Gagal Reset Akses: Password Konfirmasi Salah', ['target_id' => $targetId]);
+            setFlash('error', 'Konfirmasi password Superadmin salah!');
+            redirect('index.php?page=kelola_admin');
+        }
+
+        // 3. Ambil data target
+        $targetAdmin = $this->model->getById($targetId);
+        if (!$targetAdmin) {
+            setFlash('error', 'Admin target tidak ditemukan.');
+            redirect('index.php?page=kelola_admin');
+        }
+
+        // 4. Eksekusi Reset Password (jika diisi)
+        $msgParts = [];
+        if (!empty($newPassword)) {
+            if (strlen($newPassword) < 6) {
+                setFlash('error', 'Password baru minimal 6 karakter!');
+                redirect('index.php?page=kelola_admin');
+            }
+            
+            // Re-use model->update logic (it handles hashing)
+            $updateData = $targetAdmin;
+            $updateData['password'] = $newPassword;
+            $this->model->update($targetId, $updateData);
+            $msgParts[] = 'Password berhasil diatur ulang';
+        }
+
+        // 5. Eksekusi Reset 2FA
+        if ($reset2fa) {
+            $this->model->reset2FA($targetId);
+            $msgParts[] = '2FA berhasil dinonaktifkan';
+        }
+
+        if (empty($msgParts)) {
+            setFlash('info', 'Tidak ada perubahan yang dilakukan.');
+        } else {
+            $msg = implode(' dan ', $msgParts) . '.';
+            logSecurityActivity('Reset Akses Admin', [
+                'oleh' => $superAdmin['nama'],
+                'target' => $targetAdmin['nama'],
+                'target_email' => $targetAdmin['email'],
+                'reset_2fa' => $reset2fa
+            ]);
+            setFlash('success', $msg);
+        }
+
+        redirect('index.php?page=kelola_admin');
+    }
 }

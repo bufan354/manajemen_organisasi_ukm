@@ -178,9 +178,21 @@ CREATE TABLE IF NOT EXISTS pendaftaran (
     session_id         VARCHAR(255) DEFAULT NULL,
     alasan_penolakan   TEXT         DEFAULT NULL,
     created_at         TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    deleted_at         TIMESTAMP NULL DEFAULT NULL,
     FOREIGN KEY (ukm_id) REFERENCES ukm(id) ON DELETE CASCADE,
     FOREIGN KEY (periode_id) REFERENCES periode(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
+
+-- -----------------------------------------------------------
+-- Tabel: pendaftaran_jawaban (Snapshot jawaban kuisioner)
+-- -----------------------------------------------------------
+CREATE TABLE IF NOT EXISTS pendaftaran_jawaban (
+    id                 INT AUTO_INCREMENT PRIMARY KEY,
+    pendaftaran_id     INT          NOT NULL,
+    pertanyaan_teks    TEXT         NOT NULL,
+    jawaban_teks       TEXT         NOT NULL,
+    FOREIGN KEY (pendaftaran_id) REFERENCES pendaftaran(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- -----------------------------------------------------------
 -- Tabel: pengaturan (key-value per UKM)

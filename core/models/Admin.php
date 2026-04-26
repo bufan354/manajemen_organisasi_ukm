@@ -139,4 +139,11 @@ class AdminModel
         $stmt = $this->db->prepare("UPDATE admins SET totp_secret = ?, is_2fa_active = ? WHERE id = ?");
         return $stmt->execute([$secret, $isActive, $id]);
     }
+
+    /** Reset 2FA status (disable and clear secret) */
+    public function reset2FA(int $id): bool
+    {
+        $stmt = $this->db->prepare("UPDATE admins SET totp_secret = NULL, is_2fa_active = 0 WHERE id = ?");
+        return $stmt->execute([$id]);
+    }
 }

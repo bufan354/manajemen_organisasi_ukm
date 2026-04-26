@@ -25,8 +25,6 @@
                         <?php if (Session::get('admin_role') === 'superadmin'): ?>
                         <th class="px-6 py-4 text-[11px] font-bold text-on-surface-variant uppercase tracking-[0.1em]">Asal <?= h($ENTITY) ?></th>
                         <?php endif; ?>
-                        <th class="px-6 py-4 text-[11px] font-bold text-on-surface-variant uppercase tracking-[0.1em]">Kontak</th>
-                        <th class="px-6 py-4 text-[11px] font-bold text-on-surface-variant uppercase tracking-[0.1em]">Jurusan/Kelas</th>
                         <th class="px-6 py-4 text-[11px] font-bold text-on-surface-variant uppercase tracking-[0.1em]">Tanggal Daftar</th>
                         <th class="px-6 py-4 text-[11px] font-bold text-on-surface-variant uppercase tracking-[0.1em]">Status</th>
                         <th class="px-6 py-4 text-[11px] font-bold text-on-surface-variant uppercase tracking-[0.1em] text-right">Aksi</th>
@@ -59,20 +57,6 @@
                         </td>
                         <?php endif; ?>
                         <td class="px-6 py-5">
-                            <div class="flex flex-col gap-1">
-                                <span class="flex items-center gap-1 text-xs text-on-surface-variant">
-                                    <span class="material-symbols-outlined text-[14px]">mail</span> <?= htmlspecialchars($p['email']) ?>
-                                </span>
-                                <span class="flex items-center gap-1 text-xs text-on-surface-variant mt-0.5">
-                                    <span class="material-symbols-outlined text-[14px]">call</span> <?= htmlspecialchars($p['no_wa']) ?>
-                                </span>
-                            </div>
-                        </td>
-                        <td class="px-6 py-5">
-                            <p class="text-sm text-slate-800 font-medium"><?= htmlspecialchars($p['jurusan'] ?? '-') ?></p>
-                            <p class="text-xs text-slate-500 mt-0.5"><?= htmlspecialchars($p['kelas'] ?? '-') ?></p>
-                        </td>
-                        <td class="px-6 py-5">
                             <p class="text-sm text-on-surface-variant"><?= date('d M Y', strtotime($p['created_at'])) ?></p>
                         </td>
                         <td class="px-6 py-5">
@@ -89,6 +73,21 @@
                         <td class="px-6 py-5 text-right">
                             <?php if (!isset($_SESSION['is_active_periode']) || $_SESSION['is_active_periode']): ?>
                             <div class="flex items-center justify-end gap-2">
+                                <button type="button" 
+                                    onclick='openDetailModal(<?= json_encode([
+                                        "nama" => $p["nama"],
+                                        "email" => $p["email"],
+                                        "no_wa" => $p["no_wa"],
+                                        "jurusan" => $p["jurusan"],
+                                        "kelas" => $p["kelas"],
+                                        "alasan" => $p["alasan"],
+                                        "status" => $p["status"],
+                                        "created_at" => date("d M Y, H:i", strtotime($p["created_at"])),
+                                        "answers" => $p["answers"] ?? []
+                                    ], JSON_HEX_APOS | JSON_HEX_QUOT) ?>)'
+                                    class="p-2 text-primary hover:bg-primary/5 rounded-lg transition-all flex items-center justify-center font-bold text-xs" title="Lihat Detail Jawaban">
+                                    <span class="material-symbols-outlined text-[20px]">visibility</span>
+                                </button>
                                 <?php if ($st === 'pending'): ?>
                                 <form action="index.php?action=pendaftaran_status" method="POST" class="m-0 inline-block">
     <?= csrf_field() ?>
@@ -145,4 +144,148 @@ function handleReject(form) {
     form.querySelector('.reject-reason').value = alasan;
     return true;
 }
+
+function openDetailModal(data) {
+    const modal = document.getElementById('detailModal');
+    const content = document.getElementById('detailModalContent');
+    
+    // Set Header Info
+    document.getElementById('det-nama').innerText = data.nama;
+    document.getElementById('det-status').innerText = data.status.toUpperCase();
+    document.getElementById('det-tgl').innerText = data.created_at;
+    
+    // Set Profile Info
+    document.getElementById('det-email').innerText = data.email;
+    document.getElementById('det-wa').innerText = data.no_wa;
+    document.getElementById('det-wa-link').href = `https://wa.me/${data.no_wa.replace(/[^0-9]/g, '')}`;
+    document.getElementById('det-jurusan').innerText = data.jurusan || '-';
+    document.getElementById('det-kelas').innerText = data.kelas || '-';
+    
+    // Set Motivasi
+    document.getElementById('det-motivasi').innerText = data.alasan || 'Tidak ada motivasi yang dituliskan.';
+    
+    // Set Kuisioner
+    const qContainer = document.getElementById('det-kuisioner');
+    qContainer.innerHTML = '';
+    
+    if (data.answers && data.answers.length > 0) {
+        data.answers.forEach((item, index) => {
+            const qDiv = document.createElement('div');
+            qDiv.className = 'p-4 bg-slate-50 rounded-xl border border-slate-100';
+            qDiv.innerHTML = `
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Pertanyaan ${index + 1}</p>
+                <p class="text-xs font-bold text-slate-800 mb-2">${item.pertanyaan_teks}</p>
+                <p class="text-sm text-slate-600 bg-white p-3 rounded-lg border border-slate-200/50 italic">"${item.jawaban_teks}"</p>
+            `;
+            qContainer.appendChild(qDiv);
+        });
+    } else {
+        qContainer.innerHTML = '<p class="text-xs text-slate-400 italic py-4">Tidak ada pertanyaan kuisioner tambahan untuk UKM ini.</p>';
+    }
+
+    modal.classList.remove('hidden');
+    setTimeout(() => {
+        content.classList.remove('translate-y-4', 'opacity-0');
+    }, 10);
+}
+
+function closeDetailModal() {
+    const modal = document.getElementById('detailModal');
+    const content = document.getElementById('detailModalContent');
+    content.classList.add('translate-y-4', 'opacity-0');
+    setTimeout(() => {
+        modal.classList.add('hidden');
+    }, 300);
+}
 </script>
+
+<!-- Modal Detail Pendaftar -->
+<div id="detailModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="closeDetailModal()"></div>
+    <div id="detailModalContent" class="relative bg-white w-full max-w-2xl max-h-[90vh] overflow-hidden rounded-3xl shadow-2xl transition-all duration-300 opacity-0 translate-y-4 flex flex-col">
+        <!-- Header -->
+        <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-primary/10 text-primary rounded-2xl flex items-center justify-center">
+                    <span class="material-symbols-outlined text-2xl">person_search</span>
+                </div>
+                <div>
+                    <h3 id="det-nama" class="text-xl font-black text-slate-900">Nama Pendaftar</h3>
+                    <div class="flex items-center gap-2 mt-0.5">
+                        <span id="det-status" class="px-2 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-black rounded-md border border-amber-200">PENDING</span>
+                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">• Terdaftar pada <span id="det-tgl">26 Apr 2024</span></span>
+                    </div>
+                </div>
+            </div>
+            <button onclick="closeDetailModal()" class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-slate-200 text-slate-400 transition-colors">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <!-- Body -->
+        <div class="flex-1 overflow-y-auto p-8 space-y-8 custom-scrollbar">
+            <!-- Profil Singkat -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-4">
+                    <h4 class="text-xs font-bold text-primary uppercase tracking-[0.2em]">Informasi Kontak</h4>
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center text-slate-500">
+                                <span class="material-symbols-outlined text-sm">mail</span>
+                            </div>
+                            <span id="det-email" class="text-sm font-medium text-slate-700">email@example.com</span>
+                        </div>
+                        <div class="flex items-center gap-3 group">
+                            <div class="w-8 h-8 bg-emerald-50 rounded-lg flex items-center justify-center text-emerald-600">
+                                <span class="material-symbols-outlined text-sm">call</span>
+                            </div>
+                            <a id="det-wa-link" href="#" target="_blank" class="text-sm font-bold text-emerald-600 hover:underline flex items-center gap-1">
+                                <span id="det-wa">0812345678</span>
+                                <span class="material-symbols-outlined text-[14px]">open_in_new</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <h4 class="text-xs font-bold text-primary uppercase tracking-[0.2em]">Akademik</h4>
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center text-slate-500">
+                                <span class="material-symbols-outlined text-sm">school</span>
+                            </div>
+                            <span id="det-jurusan" class="text-sm font-medium text-slate-700">Jurusan</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center text-slate-500">
+                                <span class="material-symbols-outlined text-sm">layers</span>
+                            </div>
+                            <span id="det-kelas" class="text-sm font-medium text-slate-700">Kelas / Semester</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Motivasi -->
+            <div class="space-y-3">
+                <h4 class="text-xs font-bold text-primary uppercase tracking-[0.2em]">Motivasi Bergabung</h4>
+                <div class="p-5 bg-slate-50 rounded-2xl border border-slate-100 italic text-slate-600 text-sm leading-relaxed" id="det-motivasi">
+                    "Alasan bergabung..."
+                </div>
+            </div>
+
+            <!-- Kuisioner -->
+            <div class="space-y-4">
+                <h4 class="text-xs font-bold text-primary uppercase tracking-[0.2em]">Jawaban Kuisioner</h4>
+                <div id="det-kuisioner" class="space-y-4">
+                    <!-- Dynamic Questions -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Actions -->
+        <div class="p-6 bg-slate-50 border-t border-slate-100 flex justify-end gap-3">
+            <button onclick="closeDetailModal()" class="px-6 py-3 text-sm font-bold text-slate-500 hover:text-slate-700 transition-colors">Tutup</button>
+            <p class="text-[10px] text-slate-400 italic self-center mr-auto">Tinjau dengan seksama sebelum mengambil keputusan.</p>
+        </div>
+    </div>
+</div>

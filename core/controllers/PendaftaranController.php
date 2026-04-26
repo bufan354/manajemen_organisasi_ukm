@@ -110,7 +110,20 @@ class PendaftaranController
         $noPeriodeWarning = !$activePeriode;
 
         $data['session_id'] = session_id();
-        $this->model->create($data);
+        $pendaftaranId = $this->model->create($data);
+
+        // --- Simpan Jawaban Kuisioner ke Tabel Terpisah (Integritas Arsip) ---
+        if ($pendaftaranId > 0 && isset($_POST['jawaban_kuisioner']) && is_array($_POST['jawaban_kuisioner'])) {
+            $questionsJson = $settingsMap['form_reg_questions'] ?? "[]";
+            $questions = json_decode($questionsJson, true) ?: [];
+            
+            foreach ($_POST['jawaban_kuisioner'] as $idx => $jawaban) {
+                if (isset($questions[$idx])) {
+                    $pertanyaanTeks = $questions[$idx]['text'];
+                    $this->model->createAnswer($pendaftaranId, $pertanyaanTeks, sanitize($jawaban));
+                }
+            }
+        }
 
         // --- Trigger Notifikasi Pendaftaran Baru ---
         require_once __DIR__ . '/../models/Admin.php';
