@@ -19,15 +19,15 @@ class Kehadiran
      * INSERT ON DUPLICATE KEY UPDATE → mencegah double absen
      * @return string 'recorded' (baru), 'already' (sudah absen), 'error'
      */
-    public function recordAttendance(int $eventId, int $anggotaId, string $metode = 'fingerprint'): string
+    public function recordAttendance(int $eventId, int $anggotaId, string $metode = 'fingerprint', ?string $keterangan = null): string
     {
         try {
             $stmt = $this->db->prepare(
-                "INSERT INTO absensi (event_id, anggota_id, waktu_hadir, metode)
-                 VALUES (?, ?, NOW(), ?)
-                 ON DUPLICATE KEY UPDATE waktu_hadir = waktu_hadir"
+                "INSERT INTO absensi (event_id, anggota_id, waktu_hadir, metode, keterangan)
+                 VALUES (?, ?, NOW(), ?, ?)
+                 ON DUPLICATE KEY UPDATE waktu_hadir = waktu_hadir, keterangan = VALUES(keterangan)"
             );
-            $stmt->execute([$eventId, $anggotaId, $metode]);
+            $stmt->execute([$eventId, $anggotaId, $metode, $keterangan]);
             
             // rowCount = 1 → inserted (baru), 0 → duplicate (sudah ada, tidak diubah)
             return $stmt->rowCount() > 0 ? 'recorded' : 'already';
@@ -38,12 +38,21 @@ class Kehadiran
     }
 
     /**
+     * Hapus kehadiran anggota di event
+     */
+    public function removeAttendance(int $eventId, int $anggotaId): bool
+    {
+        $stmt = $this->db->prepare("DELETE FROM absensi WHERE event_id = ? AND anggota_id = ?");
+        return $stmt->execute([$eventId, $anggotaId]);
+    }
+
+    /**
      * Ambil daftar kehadiran per event (dengan data anggota)
      */
     public function getByEvent(int $eventId): array
     {
         $stmt = $this->db->prepare(
-            "SELECT a.id, a.event_id, a.anggota_id, a.waktu_hadir, a.metode, 
+            "SELECT a.id, a.event_id, a.anggota_id, a.waktu_hadir, a.metode, a.keterangan,
                     ang.nama, ang.nim, ang.jabatan, ang.foto_path,
                     ang.ukm_id
              FROM absensi a

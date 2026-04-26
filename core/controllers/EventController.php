@@ -130,6 +130,23 @@ class EventController
             redirect('index.php?page=event');
         }
 
+        // --- Security Check: Past Events ---
+        $isAdmin = Session::get('admin_role') === 'admin';
+        $isPast = strtotime($existing['waktu_mulai']) < time();
+        $waktuMulaiInput = $_POST['waktu_mulai'] ?? '';
+        
+        // Cek jika mencoba mengubah tanggal kegiatan yang sudah lewat
+        if ($isAdmin && $isPast) {
+            $newTs = strtotime(str_replace('T', ' ', $waktuMulaiInput));
+            $oldTs = strtotime($existing['waktu_mulai']);
+            
+            if ($newTs !== $oldTs) {
+                setFlash('error', 'Keamanan: Admin tidak diperbolehkan mengubah jadwal kegiatan yang sudah lewat. Silakan hubungi Superadmin jika ada kesalahan jadwal.');
+                redirect('index.php?page=event');
+            }
+        }
+        // ----------------------------------
+
         $ukmId = Session::get('admin_role') === 'superadmin'
             ? (int)($_POST['ukm_id'] ?? $existing['ukm_id'])
             : (int)Session::get('ukm_id');
@@ -535,5 +552,40 @@ class EventController
 
         setFlash('success', 'Redaksi pengumuman kegiatan berhasil dibuat! Silakan copy-paste ke grup.');
         redirect('index.php?page=event');
+    }
+
+    /** Toggle kehadiran manual per anggota (AJAX) */
+    public function toggleKehadiranManual(): void
+    {
+        header('Content-Type: application/json');
+        Session::requireLogin();
+
+        $eventId = (int)($_POST['event_id'] ?? 0);
+        $anggotaId = (int)($_POST['anggota_id'] ?? 0);
+        $action = $_POST['attendance_action'] ?? 'present'; // 'present' or 'absent'
+        $reason = sanitize($_POST['reason'] ?? '');
+
+        if ($eventId === 0 || $anggotaId === 0) {
+            echo json_encode(['success' => false, 'error' => 'Data tidak lengkap.']);
+            exit;
+        }
+
+        require_once __DIR__ . '/../models/Kehadiran.php';
+        $kehadiranModel = new Kehadiran();
+
+        if ($action === 'present') {
+            if (empty($reason)) {
+                echo json_encode(['success' => false, 'error' => 'Alasan wajib diisi untuk absensi manual.']);
+                exit;
+            }
+            $res = $kehadiranModel->recordAttendance($eventId, $anggotaId, 'manual', $reason);
+            logSecurityActivity('Absensi Manual Anggota', ['event_id' => $eventId, 'anggota_id' => $anggotaId, 'reason' => $reason]);
+            echo json_encode(['success' => true, 'message' => 'Kehadiran berhasil dicatat.']);
+        } else {
+            $res = $kehadiranModel->removeAttendance($eventId, $anggotaId);
+            logSecurityActivity('Hapus Absensi Anggota', ['event_id' => $eventId, 'anggota_id' => $anggotaId]);
+            echo json_encode(['success' => true, 'message' => 'Kehadiran berhasil dihapus.']);
+        }
+        exit;
     }
 }

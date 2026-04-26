@@ -215,6 +215,7 @@ CREATE TABLE IF NOT EXISTS absensi (
     anggota_id  INT NOT NULL,
     waktu_hadir DATETIME DEFAULT CURRENT_TIMESTAMP,
     metode      ENUM('fingerprint','rfid','manual') DEFAULT 'manual',
+    keterangan  TEXT DEFAULT NULL,
     FOREIGN KEY (event_id)   REFERENCES events(id)  ON DELETE CASCADE,
     FOREIGN KEY (anggota_id) REFERENCES anggota(id)  ON DELETE CASCADE,
     UNIQUE KEY unique_absensi (event_id, anggota_id),

@@ -108,6 +108,7 @@ foreach ($kehadiranList as $k) {
                     <th class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-[0.1em]">Jabatan</th>
                     <th class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-[0.1em]">Waktu Hadir</th>
                     <th class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-[0.1em]">Metode</th>
+                    <th class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-[0.1em]">Aksi</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-50">
@@ -161,6 +162,26 @@ foreach ($kehadiranList as $k) {
                         </span>
                         <?php endif; ?>
                     </td>
+                    <td class="px-6 py-4">
+                        <?php if ($isHadir): ?>
+                            <?php if ($kh['metode'] === 'manual'): ?>
+                                <button onclick="toggleManual(<?= $ang['id'] ?>, 'absent')" class="text-red-500 hover:text-red-700 flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider transition-colors">
+                                    <span class="material-symbols-outlined text-sm">close</span> Batalkan
+                                </button>
+                                <?php if (!empty($kh['keterangan'])): ?>
+                                    <div class="text-[9px] text-slate-400 italic mt-1 max-w-[120px] truncate" title="<?= htmlspecialchars($kh['keterangan']) ?>">
+                                        Alasan: <?= htmlspecialchars($kh['keterangan']) ?>
+                                    </div>
+                                <?php endif; ?>
+                            <?php else: ?>
+                                <span class="text-slate-300 material-symbols-outlined text-sm" title="Absensi fisik tidak dapat diubah manual">lock</span>
+                            <?php endif; ?>
+                        <?php else: ?>
+                            <button onclick="openManualModal(<?= $ang['id'] ?>, '<?= htmlspecialchars($ang['nama']) ?>')" class="bg-blue-50 text-blue-600 px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider hover:bg-blue-600 hover:text-white transition-all flex items-center gap-1 group">
+                                <span class="material-symbols-outlined text-sm group-hover:animate-pulse">edit_note</span> Hadir Manual
+                            </button>
+                        <?php endif; ?>
+                    </td>
                 </tr>
                 <?php endforeach; endif; ?>
             </tbody>
@@ -198,7 +219,89 @@ foreach ($kehadiranList as $k) {
     </div>
 </div>
 
+<!-- Modal: Alasan Absensi Manual -->
+<div id="manualModal" class="hidden fixed inset-0 z-[110] flex items-center justify-center">
+    <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onclick="closeManualModal()"></div>
+    <div class="relative bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl overflow-hidden transform scale-95 opacity-0 transition-all duration-300" id="manualModalContent">
+        <div class="w-16 h-16 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center mb-6 mx-auto">
+            <span class="material-symbols-outlined text-[32px]">security</span>
+        </div>
+        <h3 class="text-2xl font-black text-slate-900 text-center mb-2">Konfirmasi Kehadiran</h3>
+        <p class="text-slate-500 text-center text-sm leading-relaxed mb-6">
+            Anda akan menghadirkan <span id="manualTargetName" class="font-bold text-slate-900"></span> secara manual. Mohon berikan alasan yang valid (misal: "Alat sensor error").
+        </p>
+        
+        <input type="hidden" id="manualAnggotaId">
+        <div class="mb-6">
+            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Alasan Kehadiran Manual</label>
+            <textarea id="manualReason" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary/20 outline-none transition-all" placeholder="Tulis alasan di sini..." rows="3"></textarea>
+        </div>
+        
+        <div class="flex gap-4">
+            <button type="button" onclick="closeManualModal()" class="flex-1 py-3 px-4 bg-slate-100 text-slate-600 font-bold text-sm rounded-xl hover:bg-slate-200 transition-colors">Batal</button>
+            <button type="button" onclick="submitManual()" class="flex-1 py-3 px-4 bg-blue-600 text-white font-bold text-sm rounded-xl shadow-lg shadow-blue-200 hover:bg-blue-700 transition-colors">Simpan Hadir</button>
+        </div>
+    </div>
+</div>
+
 <script>
+    // --- Manual Attendance Logic ---
+    function openManualModal(id, name) {
+        document.getElementById('manualAnggotaId').value = id;
+        document.getElementById('manualTargetName').innerText = name;
+        document.getElementById('manualReason').value = '';
+        
+        const modal = document.getElementById('manualModal');
+        const content = document.getElementById('manualModalContent');
+        modal.classList.remove('hidden');
+        setTimeout(() => { content.classList.remove('scale-95', 'opacity-0'); }, 10);
+    }
+
+    function closeManualModal() {
+        const content = document.getElementById('manualModalContent');
+        content.classList.add('scale-95', 'opacity-0');
+        setTimeout(() => { document.getElementById('manualModal').classList.add('hidden'); }, 300);
+    }
+
+    function submitManual() {
+        const id = document.getElementById('manualAnggotaId').value;
+        const reason = document.getElementById('manualReason').value;
+        
+        if (!reason.trim()) {
+            alert('Harap masukkan alasan kehadiran manual.');
+            return;
+        }
+        
+        toggleManual(id, 'present', reason);
+    }
+
+    function toggleManual(anggotaId, action, reason = '') {
+        const formData = new FormData();
+        formData.append('event_id', '<?= $ev['id'] ?>');
+        formData.append('anggota_id', anggotaId);
+        formData.append('attendance_action', action);
+        formData.append('reason', reason);
+        formData.append('csrf_token', '<?= csrf_token() ?>');
+
+        fetch('index.php?action=kehadiran_toggle_manual', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert(data.error || 'Terjadi kesalahan sistem.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Gagal menghubungi server.');
+        });
+    }
+
+    // --- Import Modal Logic ---
     function openImportModal() {
         const modal = document.getElementById('importModal');
         const content = document.getElementById('importModalContent');

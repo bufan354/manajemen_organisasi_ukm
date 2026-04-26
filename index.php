@@ -207,6 +207,10 @@ if ($action) {
             require_once 'core/controllers/EventController.php';
             (new EventController())->importKehadiranCsv();
             break;
+        case 'kehadiran_toggle_manual':
+            require_once 'core/controllers/EventController.php';
+            (new EventController())->toggleKehadiranManual();
+            break;
 
         // --- Periode ---
         case 'periode_store':
