@@ -161,8 +161,6 @@ function toggleRoutine(isRoutine) {
         routinePanel.classList.remove('hidden');
         singleInputs.forEach(i => i.removeAttribute('required'));
         routineInputs.forEach(i => i.setAttribute('required', 'required'));
-        // check boxes don't need required strictly, but radio/time yes.
-        // Actually, let's just custom validate days later if needed, but remove 'required' from days to prevent form block if none picked, though they should pick. Let's remove required from checkbox.
         document.querySelectorAll('input[type="checkbox"][name="hari[]"]').forEach(i => i.removeAttribute('required'));
     } else {
         singlePanel.classList.remove('hidden');
@@ -172,6 +170,19 @@ function toggleRoutine(isRoutine) {
     }
 }
 
+// Set min date to now for Once Events
+function setMinDate() {
+    const now = new Date();
+    const tzOffset = now.getTimezoneOffset() * 60000;
+    const localISOTime = (new Date(now - tzOffset)).toISOString().slice(0, 16);
+    const dateInput = document.getElementsByName('waktu_mulai')[0];
+    if (dateInput) {
+        dateInput.setAttribute('min', localISOTime);
+        dateInput.value = localISOTime;
+    }
+}
+
 // init
 toggleRoutine(false);
+setMinDate();
 </script>

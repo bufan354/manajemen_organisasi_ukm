@@ -67,6 +67,17 @@ class EventController
             'status_absensi' => isset($_POST['status_absensi']) ? 1 : 0,
         ];
 
+        // --- Security Check: Past Events ---
+        $isAdmin = Session::get('admin_role') === 'admin';
+        if ($isAdmin && !$isRoutine) {
+            $checkTs = strtotime($waktuMulai);
+            if ($checkTs < time() - 60) { // Grace period 1 menit
+                setFlash('error', 'Keamanan: Anda tidak diperbolehkan membuat kegiatan di masa lampau.');
+                redirect('index.php?page=event');
+            }
+        }
+        // ----------------------------------
+
         $this->model->create($data);
         logSecurityActivity('Tambah Kegiatan Baru', ['nama' => $data['nama'], 'waktu_mulai' => $data['waktu_mulai']]);
         
