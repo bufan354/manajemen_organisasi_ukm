@@ -80,4 +80,4 @@ Sistem ini dikembangkan dengan arsitektur modular yang mencakup berbagai aspek k
 Kami menerima kontribusi dalam bentuk pelaporan bug, saran fitur, atau pull request. Pastikan untuk selalu melakukan `git pull` sebelum memulai perubahan.
 
 ---
-Dikembangkan dengan ❤️ oleh **Tim Pengembang Organisasi Digital**.
+Dikembangkan dengan ❤️ oleh **Sekertaris Umum II BEM INSTBUNAS Majalengka 2025, ketua umum UKM Broadcast 2025 dan Kosma TI24Re1**.
