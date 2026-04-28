@@ -72,9 +72,35 @@ class PeriodeController
         $ukmId = (int)($_POST['ukm_id'] ?? $_GET['ukm_id'] ?? 0);
 
         if ($id > 0) {
+            // Delete associated physical files
+            $db = Database::getConnection();
+            $stmt = $db->prepare("SELECT file_surat, konten_surat FROM arsip_surat WHERE periode_id = ?");
+            $stmt->execute([$id]);
+            $suratList = $stmt->fetchAll();
+
+            foreach ($suratList as $s) {
+                if (!empty($s['file_surat']) && file_exists(__DIR__ . '/../../' . $s['file_surat'])) {
+                    unlink(__DIR__ . '/../../' . $s['file_surat']);
+                }
+                $konten = json_decode($s['konten_surat'], true) ?? [];
+                if (!empty($konten['lampiran_uploaded']) && is_array($konten['lampiran_uploaded'])) {
+                    foreach ($konten['lampiran_uploaded'] as $l) {
+                        if (!empty($l) && file_exists(__DIR__ . '/../../' . $l)) {
+                            unlink(__DIR__ . '/../../' . $l);
+                        }
+                    }
+                }
+                if (!empty($konten['ttd_ketua_custom']) && file_exists(__DIR__ . '/../../' . $konten['ttd_ketua_custom'])) {
+                    unlink(__DIR__ . '/../../' . $konten['ttd_ketua_custom']);
+                }
+                if (!empty($konten['ttd_sekre_custom']) && file_exists(__DIR__ . '/../../' . $konten['ttd_sekre_custom'])) {
+                    unlink(__DIR__ . '/../../' . $konten['ttd_sekre_custom']);
+                }
+            }
+
             $this->model->delete($id);
             logSecurityActivity('Hapus Periode UKM', ['periode_id' => $id]);
-            setFlash('success', 'Periode berhasil dihapus.');
+            setFlash('success', 'Periode beserta seluruh arsip fisiknya berhasil dihapus.');
         }
         redirect("index.php?page=kelola_periode&ukm_id=$ukmId");
     }

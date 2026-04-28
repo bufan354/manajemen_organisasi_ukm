@@ -31,6 +31,18 @@ if ($isSuperAdmin) {
     $systemItems['log_keamanan'] = ['icon' => 'security', 'label' => 'Log Keamanan'];
 }
 
+$suratItems = [
+    'arsip_surat'      => ['icon' => 'folder_open', 'label' => 'Arsip Surat'],
+    'buat_surat'       => ['icon' => 'edit_note',   'label' => 'Buat Surat Otomatis'],
+    'pengaturan_surat' => ['icon' => 'settings_applications', 'label' => 'Pengaturan Surat'],
+];
+
+$pinjamItems = [
+    'master_barang'   => ['icon' => 'inventory_2', 'label' => 'Master Barang'],
+    'cetak_lampiran'  => ['icon' => 'print',       'label' => 'Cetak Lampiran'],
+    'arsip_lampiran'  => ['icon' => 'archive',     'label' => 'Arsip Lampiran'],
+];
+
 function renderNav($id, $item, $currentPage) {
     if ($id == $currentPage) {
         $fillRule = (isset($item['fill']) && $item['fill']) ? "style=\"font-variation-settings: 'FILL' 1;\"" : "";
@@ -65,6 +77,16 @@ function renderNav($id, $item, $currentPage) {
             <?= renderNav($id, $item, $currentPage) ?>
         <?php endforeach; ?>
         
+        <div class="px-3 mt-6 mb-2 text-[10px] font-bold uppercase tracking-[0.1em] text-outline">Surat & Arsip</div>
+        <?php foreach ($suratItems as $id => $item): ?>
+            <?= renderNav($id, $item, $currentPage) ?>
+        <?php endforeach; ?>
+
+        <div class="px-3 mt-6 mb-2 text-[10px] font-bold uppercase tracking-[0.1em] text-outline">Peminjaman Barang</div>
+        <?php foreach ($pinjamItems as $id => $item): ?>
+            <?= renderNav($id, $item, $currentPage) ?>
+        <?php endforeach; ?>
+
         <div class="px-3 mt-6 mb-2 text-[10px] font-bold uppercase tracking-[0.1em] text-outline">Sistem</div>
         
         <?php foreach ($systemItems as $id => $item): ?>

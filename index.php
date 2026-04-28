@@ -404,6 +404,76 @@ if ($action) {
             echo json_encode(['labels' => $chartLabels, 'dataRates' => $chartDataObj]);
             exit;
 
+        // --- Sistem Surat & Inventaris ---
+        case 'arsip_surat_store':
+            require_once 'core/controllers/SuratController.php';
+            (new SuratController())->store();
+            break;
+        case 'arsip_surat_update':
+            require_once 'core/controllers/SuratController.php';
+            (new SuratController())->update();
+            break;
+        case 'arsip_surat_delete':
+            require_once 'core/controllers/SuratController.php';
+            (new SuratController())->delete();
+            break;
+        case 'arsip_surat_update_tanggal':
+            require_once 'core/controllers/SuratController.php';
+            (new SuratController())->updateTanggal();
+            break;
+        case 'arsip_surat_duplicate':
+            require_once 'core/controllers/SuratController.php';
+            (new SuratController())->duplicate();
+            break;
+        case 'arsip_surat_export':
+            require_once 'core/controllers/SuratController.php';
+            (new SuratController())->export();
+            break;
+        case 'arsip_surat_save_kop':
+            require_once 'core/controllers/SuratController.php';
+            (new SuratController())->saveKop();
+            break;
+        case 'surat_template_store':
+            require_once 'core/controllers/SuratController.php';
+            (new SuratController())->storeTemplate();
+            break;
+        case 'surat_template_delete':
+            require_once 'core/controllers/SuratController.php';
+            (new SuratController())->deleteTemplate();
+            break;
+        case 'panitia_tetap_save':
+            require_once 'core/controllers/SuratController.php';
+            (new SuratController())->savePanitia();
+            break;
+        case 'panitia_tetap_delete':
+            require_once 'core/controllers/SuratController.php';
+            (new SuratController())->deletePanitia();
+            break;
+        case 'surat_global_save':
+            require_once 'core/controllers/SuratController.php';
+            (new SuratController())->saveGlobalSurat();
+            break;
+        case 'barang_store':
+            require_once 'core/controllers/BarangController.php';
+            (new BarangController())->store();
+            break;
+        case 'barang_update':
+            require_once 'core/controllers/BarangController.php';
+            (new BarangController())->update();
+            break;
+        case 'barang_delete':
+            require_once 'core/controllers/BarangController.php';
+            (new BarangController())->delete();
+            break;
+        case 'lampiran_pinjam_store':
+            require_once 'core/controllers/SuratController.php';
+            (new SuratController())->storeLampiran();
+            break;
+        case 'lampiran_pinjam_delete':
+            require_once 'core/controllers/SuratController.php';
+            (new SuratController())->deleteLampiran();
+            break;
+
         default:
             redirect('index.php?page=home');
     }
@@ -1187,6 +1257,155 @@ switch ($page) {
             'title'    => 'Konfigurasi Umum - Super Admin',
             'settings' => $settingsUmum,
         ]);
+        break;
+
+    // --- Sistem Surat & Inventaris ---
+    case 'arsip_surat':
+    case 'buat_surat':
+    case 'arsip_manual':
+    case 'pengaturan_surat':
+    case 'master_barang':
+    case 'cetak_lampiran':
+    case 'arsip_lampiran':
+        Session::requireLogin();
+        require_once 'core/models/Surat.php';
+        require_once 'core/models/Ukm.php';
+        require_once 'core/models/Periode.php';
+        require_once 'core/models/Barang.php';
+        require_once 'core/models/Pengaturan.php';
+
+        $role = Session::get('admin_role');
+        
+        // Resolve ukm_id
+        if ($role === 'superadmin') {
+            $ukm_id = (int)($_GET['ukm_id'] ?? Session::get('last_ukm_id') ?? 0);
+            if ($ukm_id > 0) {
+                if ($ukm_id !== (int)Session::get('last_ukm_id')) {
+                    Session::set('periode_id', 0);
+                }
+                Session::set('last_ukm_id', $ukm_id);
+            }
+        } else {
+            $ukm_id = (int)Session::get('ukm_id');
+        }
+
+        // Resolve periode_id
+        if (isset($_GET['periode_id'])) {
+            $periode_id = (int)$_GET['periode_id'];
+            Session::set('periode_id', $periode_id);
+        } else {
+            $periode_id = (int)Session::get('periode_id');
+        }
+
+        if ($periode_id === 0) {
+            // Coba ambil periode aktif UKM tersebut
+            $activePeriode = (new Periode())->getActive($ukm_id);
+            $periode_id = $activePeriode ? (int)$activePeriode['id'] : 0;
+            
+            if ($periode_id > 0) {
+                Session::set('periode_id', $periode_id);
+            }
+
+            if ($ukm_id > 0 && $periode_id === 0 && $page !== 'master_barang') {
+                setFlash('error', 'Organisasi ini belum memiliki periode aktif. Silakan buat periode terlebih dahulu.');
+                redirect('index.php?page=periode&ukm_id=' . $ukm_id);
+            }
+        }
+
+        $suratModel = new SuratModel();
+        $barangModel = new BarangModel();
+        $ukmModel = new Ukm();
+        $pengaturanModel = new Pengaturan();
+        
+        $ukm = $ukmModel->getById($ukm_id);
+        $kop_surat = $pengaturanModel->get($ukm_id, 'kop_surat');
+        $isSuperAdmin = ($role === 'superadmin');
+        
+        $activePeriode = (new Periode())->getActive($ukm_id);
+        $activePeriodeId = $activePeriode ? (int)$activePeriode['id'] : 0;
+        
+        $semua_periode = (new Periode())->getAll($ukm_id);
+        $can_edit = $isSuperAdmin || ($periode_id === $activePeriodeId);
+
+        $viewData = [
+            'ukm'              => $ukm,
+            'ukm_id'           => $ukm_id,
+            'periode_id'       => $periode_id,
+            'active_periode_id'=> $activePeriodeId,
+            'semua_periode'    => $semua_periode,
+            'can_edit'         => $can_edit,
+            'isSuperAdmin'     => $isSuperAdmin,
+            'kop_surat'        => $kop_surat
+        ];
+
+        if ($page === 'arsip_surat') {
+            $jenis = $_GET['jenis'] ?? 'L';
+            View::renderAdmin('admin/surat/arsip', array_merge($viewData, [
+                'title'      => 'Arsip Surat',
+                'suratList'  => $suratModel->getAllArsip($ukm_id, $periode_id, $jenis),
+                'jenis'      => $jenis,
+                'latest_id'  => $suratModel->getMaxId($ukm_id, $periode_id, $jenis)
+            ]));
+        } elseif ($page === 'buat_surat') {
+            if (!$can_edit) {
+                setFlash('error', 'Anda tidak dapat menambah/mengubah surat pada periode riwayat.');
+                redirect('index.php?page=arsip_surat&ukm_id=' . $ukm_id);
+            }
+            $next_urut_L = str_pad($suratModel->getMaxSequence($ukm_id, $periode_id, 'L') + 1, 3, '0', STR_PAD_LEFT);
+            $next_urut_D = str_pad($suratModel->getMaxSequence($ukm_id, $periode_id, 'D') + 1, 3, '0', STR_PAD_LEFT);
+            $jenis = $_GET['jenis'] ?? 'L';
+            $next_urut = ($jenis === 'D') ? $next_urut_D : $next_urut_L;
+
+            View::renderAdmin('admin/surat/buat', array_merge($viewData, [
+                'title'      => 'Buat Surat Otomatis',
+                'next_urut'  => $next_urut,
+                'next_urut_L' => $next_urut_L,
+                'next_urut_D' => $next_urut_D,
+                'templates'  => $suratModel->getTemplates($ukm_id, $periode_id),
+                'panitia'    => $suratModel->getPanitia($ukm_id, $periode_id),
+                'edit_data'  => isset($_GET['edit']) ? $suratModel->getArsipById((int)$_GET['edit'], $ukm_id) : null,
+                'clone_data' => isset($_GET['clone']) ? $suratModel->getArsipById((int)$_GET['clone'], $ukm_id) : null,
+                'lampiran_internal_list' => $suratModel->getArsipLampiran($ukm_id, $periode_id)
+            ]));
+        } elseif ($page === 'arsip_manual') {
+            if (!$can_edit) {
+                setFlash('error', 'Anda tidak dapat menambah/mengubah surat pada periode riwayat.');
+                redirect('index.php?page=arsip_surat&ukm_id=' . $ukm_id);
+            }
+            View::renderAdmin('admin/surat/manual', array_merge($viewData, [
+                'title'      => 'Catat Surat Manual',
+                'edit_data'  => isset($_GET['edit']) ? $suratModel->getArsipById((int)$_GET['edit'], $ukm_id) : null,
+                'type'       => $_GET['type'] ?? 'M'
+            ]));
+        } elseif ($page === 'pengaturan_surat') {
+            $settingsRaw = (new Pengaturan())->getAll($ukm_id);
+            $settingsMap = [];
+            foreach ($settingsRaw as $row) { $settingsMap[$row['kunci']] = $row['nilai']; }
+            
+            View::renderAdmin('admin/surat/pengaturan', array_merge($viewData, [
+                'title'     => 'Pengaturan Surat & Panitia',
+                'templates' => $suratModel->getTemplates($ukm_id, $periode_id),
+                'panitia_inti' => $suratModel->getPanitia($ukm_id, $periode_id, 'inti'),
+                'panitia_list' => $suratModel->getPanitia($ukm_id, $periode_id, 'panitia'),
+                'settings'  => $settingsMap,
+                'global_settings' => $suratModel->getAllGlobalSettings()
+            ]));
+        } elseif ($page === 'master_barang') {
+            View::renderAdmin('admin/surat/master_barang', array_merge($viewData, [
+                'title'      => 'Master Inventaris Barang',
+                'items'      => $barangModel->getAll($ukm_id)
+            ]));
+        } elseif ($page === 'cetak_lampiran') {
+            View::renderAdmin('admin/surat/cetak_lampiran', array_merge($viewData, [
+                'title'      => 'Buat Lampiran Peminjaman',
+                'items'      => $barangModel->getAll($ukm_id)
+            ]));
+        } elseif ($page === 'arsip_lampiran') {
+            View::renderAdmin('admin/surat/arsip_lampiran', array_merge($viewData, [
+                'title'      => 'Arsip Lampiran Peminjaman',
+                'arsip'      => $suratModel->getArsipLampiran($ukm_id, $periode_id)
+            ]));
+        }
         break;
 
     // ==========================================

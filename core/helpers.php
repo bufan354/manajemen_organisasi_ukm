@@ -187,3 +187,22 @@ function formatWhatsAppPhone(string $phone): string
     
     return $formatted;
 }
+
+/** Format Tanggal Indonesia */
+function formatIndoDate(?string $date): string
+{
+    if (!$date) return '-';
+    $timestamp = strtotime($date);
+    if (!$timestamp) return $date;
+
+    $months = [
+        1 => 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+        'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+    ];
+
+    $d = date('d', $timestamp);
+    $m = $months[(int)date('m', $timestamp)];
+    $y = date('Y', $timestamp);
+
+    return "{$d} {$m} {$y}";
+}

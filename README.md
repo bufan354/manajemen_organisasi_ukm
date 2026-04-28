@@ -38,6 +38,15 @@ Sistem ini dikembangkan dengan arsitektur modular yang mencakup berbagai aspek k
 - **Audit Log**: Pencatatan aktivitas sensitif untuk memantau penggunaan sistem.
 - **Soft Delete**: Sistem arsip data pendaftaran agar histori tidak hilang meski data telah dihapus dari daftar aktif.
 
+### 6. 📧 Manajemen Persuratan & Arsip Digital (Premium)
+- **Otomasi Nomor Surat**: Sistem penomoran otomatis yang cerdas, mendukung klasifikasi surat (Internal/Eksternal) dengan sistem reset otomatis per periode kepengurusan.
+- **Smart Grouping & Cloning**: Fitur untuk mengelompokkan surat induk dan turunannya (misal: Undangan & Lampiran) serta fitur duplikasi surat instan.
+- **Multi-Period Archiving**: Pemisahan arsip dokumen antar periode kepengurusan dengan penegakan akses *read-only* untuk periode riwayat guna menjaga integritas data.
+- **Manajemen Template Dinamis**: Database template untuk Tujuan, Perihal, dan Lokasi yang dapat dikustomisasi untuk efisiensi administrasi.
+- **Opsi Pengesahan Terintegrasi**: Logika pengesahan (TTD & Cap/Stempel) yang saling eksklusif antara pihak Rektorat, BEM, atau internal UKM.
+- **Print Layout & Export**: Output cetak surat premium dengan dukungan Kop Surat kustom per organisasi dan fitur ekspor data arsip ke format Excel.
+- **Storage Optimization**: Sistem *Cascading Delete* yang membersihkan file fisik (PDF & Lampiran) secara otomatis saat sebuah periode dihapus.
+
 ## 🛠 Arsitektur Teknologi
 
 - **Backend**: PHP 8.x (Custom MVC Architecture)
@@ -60,7 +69,7 @@ Sistem ini dikembangkan dengan arsitektur modular yang mencakup berbagai aspek k
    ```
 2. Konfigurasi Database:
    - Buat database baru di MySQL.
-   - Import file `database/schema.sql`.
+   - Import file `database/schema.sql` (Core) dan `database/surat_schema.sql` (Module Persuratan).
 3. Atur Lingkungan:
    - Salin file `.env.example` ke `.env`.
    - Sesuaikan kredensial database dan API Key.

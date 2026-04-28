@@ -137,6 +137,23 @@
                 <label class="block text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mb-2">Nama Periode</label>
                 <input type="text" name="nama" required placeholder="Contoh: Kabinet Inovasi" class="w-full bg-surface-container-highest border-none rounded-xl px-4 py-3 text-sm focus:ring-0 focus:border-b-2 border-b-2 border-transparent focus:border-b-primary transition-all">
             </div>
+            <?php 
+            $activePr = null;
+            foreach ($periodeList as $p) {
+                if ($p['is_active']) { $activePr = $p; break; }
+            }
+            $defBulanMulai = (int)date('n');
+            $defTahunMulai = (int)date('Y');
+            $defBulanSelesai = (int)date('n');
+            $defTahunSelesai = (int)date('Y') + 1;
+
+            if ($activePr) {
+                $defBulanMulai = (int)($activePr['bulan_selesai'] ?? date('n'));
+                $defTahunMulai = (int)($activePr['tahun_selesai'] ?? date('Y'));
+                $defBulanSelesai = $defBulanMulai;
+                $defTahunSelesai = $defTahunMulai + 1;
+            }
+            ?>
             <div class="grid grid-cols-2 gap-5 mb-5">
                 <div>
                     <label class="block text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mb-2">Bulan/Tahun Mulai</label>
@@ -145,11 +162,11 @@
                             <?php 
                             $nmBulan = [1=>'Januari',2=>'Februari',3=>'Maret',4=>'April',5=>'Mei',6=>'Juni',7=>'Juli',8=>'Agustus',9=>'September',10=>'Oktober',11=>'November',12=>'Desember'];
                             foreach($nmBulan as $n=>$b) { 
-                                $sel = $n == date('n') ? 'selected' : '';
+                                $sel = $n == $defBulanMulai ? 'selected' : '';
                                 echo "<option value='$n' $sel>$b</option>";
                             } ?>
                         </select>
-                        <input type="number" name="tahun_mulai" required value="<?= date('Y') ?>" class="w-1/2 bg-surface-container-highest border-none rounded-xl px-4 py-3 text-sm focus:ring-0 focus:border-b-2 border-b-2 border-transparent focus:border-b-primary transition-all">
+                        <input type="number" name="tahun_mulai" required value="<?= $defTahunMulai ?>" class="w-1/2 bg-surface-container-highest border-none rounded-xl px-4 py-3 text-sm focus:ring-0 focus:border-b-2 border-b-2 border-transparent focus:border-b-primary transition-all">
                     </div>
                 </div>
                 <div>
@@ -157,11 +174,11 @@
                     <div class="flex gap-2">
                         <select name="bulan_selesai" required class="w-1/2 bg-surface-container-highest border-none rounded-xl px-4 py-3 text-sm focus:ring-0 focus:border-b-2 border-b-2 border-transparent focus:border-b-primary transition-all">
                             <?php foreach($nmBulan as $n=>$b) { 
-                                $sel = $n == date('n') ? 'selected' : '';
+                                $sel = $n == $defBulanSelesai ? 'selected' : '';
                                 echo "<option value='$n' $sel>$b</option>";
                             } ?>
                         </select>
-                        <input type="number" name="tahun_selesai" required value="<?= date('Y') + 1 ?>" class="w-1/2 bg-surface-container-highest border-none rounded-xl px-4 py-3 text-sm focus:ring-0 focus:border-b-2 border-b-2 border-transparent focus:border-b-primary transition-all">
+                        <input type="number" name="tahun_selesai" required value="<?= $defTahunSelesai ?>" class="w-1/2 bg-surface-container-highest border-none rounded-xl px-4 py-3 text-sm focus:ring-0 focus:border-b-2 border-b-2 border-transparent focus:border-b-primary transition-all">
                     </div>
                 </div>
             </div>

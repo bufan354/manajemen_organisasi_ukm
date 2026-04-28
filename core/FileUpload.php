@@ -7,7 +7,7 @@
 class FileUpload
 {
     private static string $baseDir = 'uploads';
-    private static array $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    private static array $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf'];
     private static int $maxSize = 5 * 1024 * 1024; // 5MB
 
     /**
@@ -74,10 +74,60 @@ class FileUpload
     }
 
     /**
+     * Upload banyak file sekaligus
+     *
+     * @param array $files $_FILES['field_name'] (array structure)
+     * @param string $category Subfolder tujuan
+     * @return array List of paths
+     */
+    public static function uploadMultiple(array $files, string $category): array
+    {
+        $paths = [];
+        if (isset($files['name']) && is_array($files['name'])) {
+            $count = count($files['name']);
+            for ($i = 0; $i < $count; $i++) {
+                $file = [
+                    'name'     => $files['name'][$i],
+                    'type'     => $files['type'][$i],
+                    'tmp_name' => $files['tmp_name'][$i],
+                    'error'    => $files['error'][$i],
+                    'size'     => $files['size'][$i],
+                ];
+                $path = self::upload($file, $category);
+                if ($path) $paths[] = $path;
+            }
+        }
+        return $paths;
+    }
+
+    /**
      * Cek apakah ada file yang diupload pada field tertentu
      */
     public static function hasFile(string $fieldName): bool
     {
         return isset($_FILES[$fieldName]) && $_FILES[$fieldName]['error'] === UPLOAD_ERR_OK;
+    }
+
+    /**
+     * Simpan string base64 (dari canvas) sebagai file fisik
+     */
+    public static function saveBase64(string $base64, string $category): string|false
+    {
+        if (strpos($base64, 'data:image/png;base64,') === false) return false;
+
+        $data = str_replace('data:image/png;base64,', '', $base64);
+        $data = str_replace(' ', '+', $data);
+        $fileData = base64_decode($data);
+        if ($fileData === false) return false;
+
+        $filename = uniqid($category . '_', true) . '.png';
+        $targetDir = self::$baseDir . '/' . $category;
+        if (!is_dir($targetDir)) mkdir($targetDir, 0775, true);
+
+        $targetPath = $targetDir . '/' . $filename;
+        if (file_put_contents($targetPath, $fileData)) {
+            return $targetPath;
+        }
+        return false;
     }
 }
